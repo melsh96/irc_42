@@ -6,7 +6,7 @@
 #    By: meshahrv <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/07/03 13:32:10 by meshahrv          #+#    #+#              #
-#    Updated: 2023/07/04 11:05:35 by meshahrv         ###   ########.fr        #
+#    Updated: 2023/07/04 17:41:39 by meshahrv         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,7 +27,7 @@ OBJ_DIR = objs/
 SRC_DIR = src/
 INC_DIR = inc/
 
-SRC_SERVER = Server/Server.cpp
+SRC_SERVER = Server/Server.cpp Server/ServerCmds.cpp Server/ServerClean.cpp
 SRC_USER = User/User.cpp
 SRC_MSGS = Messages/Messages.cpp
 

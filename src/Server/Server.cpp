@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: c2h6 <c2h6@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: meshahrv <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/03 14:10:46 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/07/04 15:05:59 by c2h6             ###   ########.fr       */
+/*   Updated: 2023/07/04 17:43:48 by meshahrv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,11 +151,11 @@ void Server::_runServer()
 						break;
 					}
 					this->_receiveData(it);
-					break ;
+					break ; // added this
 				}
 				else if (it->revents & POLLHUP)
 				{
-					std::cerr << vert "Error: Client disconnected" fin << std::endl;
+					std::cerr << RED("Error: ") << "Client disconnected" << std::endl;
 					close(it->fd);
                     this->_pollFd.erase(it);
 					break;
@@ -172,6 +172,8 @@ void Server::_runServer()
 			}
 		}
 	}
+	this->_clean();
+	std::cerr << std::endl << YELLOW("[ SERVER SAFELY CLOSED ]") << std::endl;
 }
 
 void Server::_acceptConnection()
@@ -218,10 +220,10 @@ void Server::_receiveData(pollfd_it &it)
 				std::cerr << RED("Error: ") << "socket hung up" << std::endl;
 			else
 				std::cerr << RED("Error: ") << "recv()" << std::endl;
-			this->_deleteUser(it); // le pb arrive ici car on demande la suppression d'un user qui 
+			this->_deleteUser(it);
 		}
 		else
-			_chooseCmd(user);
+			_parseCmd(user); // essentiel pour connectio du cliet
 	}
 	catch (const std::out_of_range &e)
 	{
@@ -248,226 +250,8 @@ int Server::_getData(User *user)
 	}
 
 	std::cout << GREEN("### Success ### ") << GREY("...recv()") << std::endl;
-	std::cout << YELLOW("[ MESSAGE RECEIVED : ") << str << YELLOW("]") << std::endl;
+	std::cout << YELLOW("[ MESSAGE RECEIVED : ") << str << YELLOW("]") << std::endl << std::endl;
 	user->setMessage(str); // did not set the message in the user
 
 	return (nbyte);
-}
-
-void Server::_deleteUser(pollfd_it &it)
-{
-
-	try
-	{
-		std::cout << vert "deleteUser: it->fd: " << it->fd << fin << std::endl;
-		User *user = this->_user.at(it->fd);
-		int fd = user->getUserFd();
-
-		if (fd != -1)
-			close(fd);
-		this->_pollFd.erase(it);
-		this->_user.erase(fd);
-		delete user;
-		std::cerr << RED("Disconnecting user on socket: ") << fd << std::endl;
-	}
-	catch (const std::out_of_range &e)
-	{
-		std::cout << vert "out_of_range from deleteUser" fin << std::endl;
-	}
-}
-
-void Server::_indexingCmd()
-{
-	_indexCmd.insert(std::pair<std::string, func>("CAP", &Server::_caplsCmd));
-	_indexCmd.insert(std::pair<std::string, func>("PASS", &Server::_passCmd));
-	_indexCmd.insert(std::pair<std::string, func>("NICK", &Server::_nickCmd));
-	_indexCmd.insert(std::pair<std::string, func>("USER", &Server::_userCmd));
-	_indexCmd.insert(std::pair<std::string, func>("QUIT", &Server::_quitCmd));
-	_indexCmd.insert(std::pair<std::string, func>("PING", &Server::_pingCmd));
-}
-
-void Server::_chooseCmd(User *user)
-{
-	std::string msg = user->getMessage();
-	std::string cmd;
-	std::string buf;
-
-	// std::cout << WHITE("CHOOSE CMD!") << std::endl;
-
-	while (msg.length())
-	{
-		if (msg.find("\r\n") != std::string::npos)
-		{
-			if (msg.find(' ') != std::string::npos)
-				cmd = msg.substr(0, msg.find(' '));
-			else
-				cmd = msg.substr(0, msg.find("\r\n"));
-			if (cmd.length() == msg.find("\r\n"))
-				buf.clear();
-			else
-				buf = msg.substr(cmd.length() + 1, msg.find("\r\n") - cmd.length() - 1);
-			try
-			{
-				if (buf.find_first_not_of(' ') != std::string::npos)
-					buf = buf.substr(buf.find_first_not_of(' '));
-				else
-					buf.clear();
-				if (!buf.empty())
-					buf = buf.substr(0, buf.find_last_not_of(' ') + 1);
-				std::cout << "Command: <" << cmd << ">" << std::endl;
-				std::cout << "Buffer: <" << buf << ">" << std::endl;
-				if (cmd != "CAP" && cmd != "PASS" && !user->getPassword())
-				{
-					_closeConnection(user);
-					break;
-				}
-				for (std::map<std::string, func>::iterator it = this->_indexCmd.begin(); it != this->_indexCmd.end(); it++)
-				{
-					if (it->first == cmd)
-					{
-						(this->*(it->second))(user, buf);
-						break;
-					}
-				}
-				msg.erase(0, msg.find("\r\n") + 2);
-			}
-			catch (const std::out_of_range &e)
-			{
-				msg.erase(0, msg.find("\r\n") + 2);
-				user->sendReply("421 Unknown command");
-			}
-		}
-		else
-		{
-			msg.clear();
-			user->sendReply("Error: no \\r\\n found");
-		}
-	}
-}
-
-void Server::_closeConnection(User *user)
-{
-	try
-	{
-		user->sendReply("Please, enter PASS first. Disconnecting.");
-		int fd = user->getUserFd();
-		close(fd);
-		for (pollfd_it it = this->_pollFd.begin(); it != this->_pollFd.end(); ++it)
-		{
-			if (fd == it->fd)
-			{
-				_pollFd.erase(it);
-				break;
-			}
-		}
-		_user.erase(fd);
-		delete user;
-		std::cout << "Disconnecting user on socket " << fd << std::endl;
-	}
-	catch (const std::out_of_range &e)
-	{
-	}
-}
-
-void Server::_caplsCmd(User *user, std::string param)
-{
-	std::cout << "CAP LS" << std::endl;
-	if (param != "LS")
-		return (user->sendReply("CAP LS command"));
-}
-
-void Server::_passCmd(User *user, std::string param)
-{
-	if (user->hasBeenWelcomed())
-		return (user->sendReply("Error: pass: already welcomed"));
-	if (!param.length())
-		return (user->sendReply("Error: pass: empty"));
-	if (param.compare(_password))
-	{
-		user->setPassword(false);
-		return (user->sendReply(ERR_PASSWDMISMATCH(user->getNickname())));
-	}
-	user->setPassword(true);
-}
-
-void Server::_nickCmd(User *user, std::string param)
-{
-	if (param.empty())
-		return (user->sendReply(ERR_NONICKNAMEGIVEN(param)));
-	// if (!valid_user_name(param))
-	// 	return (user->sendReply(ERR_NONICKNAMEGIVEN(param)));
-	if (param.find(' ') != std::string::npos)
-		param = param.substr(0, param.find_first_of(' '));
-	for (users_iterator it = _user.begin(); it != _user.end(); ++it)
-	{
-		if (it->second->getNickname() == param)
-			return (user->sendReply(ERR_NICKCOLLISION()));
-	}
-	user->setNickname(param);
-}
-
-void Server::_userCmd(User *user, std::string param)
-{
-	if (user->hasBeenWelcomed())
-		return (user->sendReply(ERR_ALREADYREGISTRED(user->getNickname())));
-	if (param.empty())
-		return (user->sendReply(ERR_NEEDMOREPARAMS(user->getNickname(), "")));
-	std::string username = param.substr(0, param.find(' '));
-	std::string mode = param.substr(param.find(' ') + 1, param.find(' ', param.find(' ') + 1) - param.find(' ') - 1);
-	std::string unused = param.substr(param.find(' ', param.find(' ') + 1) + 1, param.find(' ', param.find(' ', param.find(' ') + 1) + 1) - param.find(' ', param.find(' ') + 1) - 1);
-	std::string realname;
-	if (param.find(':', param.find(' ', param.find(' ') + 1) + 1) == std::string::npos)
-		realname = "";
-	else
-		realname = param.substr(param.find(':', param.find(' ', param.find(' ') + 1) + 1) + 1);
-	if (realname == "" || mode == "" || username == "")
-		return (user->sendReply(ERR_NEEDMOREPARAMS(user->getNickname(), param)));
-	user->setRealname(realname);
-	user->setUsername(mode);
-	user->setHostname(unused);
-	if (user->getNickname().size() && user->getPassword() && !user->hasBeenWelcomed())
-		user->welcome();
-}
-
-void	Server::_pingCmd(User *user, std::string param){
-	if (param.empty())
-		return (user->sendReply(ERR_NEEDMOREPARAMS(user->getNickname(), param)));
-	if (param != "localhost" && param != "IRC") // change localhost to _hostname variable
-		return (user->sendReply(ERR_NOSUCHSERVER(user->getNickname(), param)));
-	user->sendReply(RPL_PONG(user->getNickname(), param));
-}
-
-//added this function to quit the server when the user types /quit
-void	Server::_quitCmd(User *user, std::string param)
-{
-	if (param.empty())
-		param = "No reason given by user";
-	
-	for (users_iterator it = _user.begin(); it != _user.end(); ++it)
-	{
-		if (it->second->getNickname() != user->getNickname())
-			it->second->sendReply(":" + user->getNickname() + "!d@" + "localhost" + " QUIT :Quit: " + param + ";\n" + user->getNickname() + " is exiting the network with the message: \"Quit: " + param + "\"");
-	}
-	try
-	{
-		int	fd = user->getUserFd();
-		close(fd);
-		for (pollfd_it it = _pollFd.begin(); it != _pollFd.end(); ++it)
-		{
-			if (fd == it->fd)
-			{
-				std::cout << rouge "ERASING user on socket " << fd << fin << std::endl;
-				_pollFd.erase(it);
-				break;
-			}
-		}
-		_user.erase(fd);
-		std::cout << rouge "ERASING user with socket " << fd << fin << std::endl;
-
-		delete user;
-		std::cout << rouge "Disconnecting user on socket " << fd << fin << std::endl;
-	}
-	catch (const std::out_of_range &e) {
-		std::cout << vert "ERROR c'est ici que je rentre" fin << std::endl;
-	}
 }

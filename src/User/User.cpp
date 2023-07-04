@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   User.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: c2h6 <c2h6@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: meshahrv <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/03 18:45:15 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/07/04 15:15:55 by c2h6             ###   ########.fr       */
+/*   Updated: 2023/07/04 16:32:38 by meshahrv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@ User::User(int fd, struct sockaddr_storage *userAddr) : _password(false), _welco
     
 }
 
-
 User::~User() {
 	
 	// std::cout << RED("Default Destructor") << std::endl;
@@ -35,26 +34,6 @@ User::~User() {
 int User::getUserFd() {
     
     return this->_fd;
-}
-
-void	User::sendReply(std::string reply)
-{
-	reply.append("\r\n");
-	size_t	total = 0;
-	size_t	nbytes = reply.length();
-	int		n;
-
-	while (total < nbytes)
-	{
-		n = send(_fd, &(reply[total]), nbytes - total, 0);
-		if (n == -1) break;
-		total += n;
-	}
-
-	if (n == -1)
-	{
-		std::cerr << "Error User::sendReply" << std::endl;
-	}
 }
 
 std::string	User::getUsername(){
@@ -132,4 +111,24 @@ std::string User::timestamp()
 
 void	User::clearMessage(){
 	_message.clear();
+}
+
+void	User::sendReply(std::string reply)
+{
+	reply.append("\r\n");
+	size_t	total = 0;
+	size_t	nbytes = reply.length();
+	int		n;
+
+	while (total < nbytes)
+	{
+		n = send(_fd, &(reply[total]), nbytes - total, 0);
+		if (n == -1) break;
+		total += n;
+	}
+
+	if (n == -1)
+	{
+		std::cerr << "Error User::sendReply" << std::endl;
+	}
 }

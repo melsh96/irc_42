@@ -6,7 +6,7 @@
 /*   By: meshahrv <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/03 14:10:55 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/07/03 17:09:31 by meshahrv         ###   ########.fr       */
+/*   Updated: 2023/07/04 17:36:59 by meshahrv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,12 @@
 
 extern bool loop;
 
+void    signalCheck(int n)
+{
+    (void)n;
+    loop = false;
+}
+
 int main(int ac, char **av)
 {
     loop = false;
@@ -23,6 +29,7 @@ int main(int ac, char **av)
     if (ac == 3)
     {
         loop = true;
+        signal(SIGINT, signalCheck);
         Server  server(av[1], av[2]);
     }
     else
