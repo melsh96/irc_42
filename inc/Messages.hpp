@@ -1,35 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   Messages.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: meshahrv <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/07/03 14:10:55 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/07/03 17:09:31 by meshahrv         ###   ########.fr       */
+/*   Created: 2023/07/04 10:58:08 by meshahrv          #+#    #+#             */
+/*   Updated: 2023/07/04 10:59:25 by meshahrv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <iostream>
-#include "../inc/Color.hpp"
-#include "../inc/Server.hpp"
+#ifndef MESSAGES_HPP
+# define MESSAGES_HPP
 
-extern bool loop;
+# include <string>
 
-int main(int ac, char **av)
-{
-    loop = false;
-    
-    if (ac == 3)
-    {
-        loop = true;
-        Server  server(av[1], av[2]);
-    }
-    else
-    {
-        std::cerr << RED("Error:") << " Try ./ircserv <port> <password>" << std::endl;
-        return (1);
-    }
+std::string RPL_WELCOME(std::string nick, std::string server, std::string user, std::string hostname);
+std::string RPL_YOURHOST(std::string nick, std::string server);
+std::string RPL_CREATED(std::string nick, std::string server , std::string date);
+std::string RPL_MYINFO(std::string nick, std::string server);
 
-    return (0);
-}
+#endif

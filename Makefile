@@ -6,7 +6,7 @@
 #    By: meshahrv <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/07/03 13:32:10 by meshahrv          #+#    #+#              #
-#    Updated: 2023/07/03 14:59:17 by meshahrv         ###   ########.fr        #
+#    Updated: 2023/07/04 11:05:35 by meshahrv         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,8 +28,13 @@ SRC_DIR = src/
 INC_DIR = inc/
 
 SRC_SERVER = Server/Server.cpp
+SRC_USER = User/User.cpp
+SRC_MSGS = Messages/Messages.cpp
 
-SRC = main.cpp $(addprefix $(SRC_DIR), $(SRC_SERVER))
+SRC = main.cpp \
+		$(addprefix $(SRC_DIR), $(SRC_SERVER)) \
+		$(addprefix $(SRC_DIR), $(SRC_USER)) \
+		$(addprefix $(SRC_DIR), $(SRC_MSGS)) \
 
 OBJ = $(addprefix $(OBJ_DIR), $(SRC:.cpp=.o))
 
