@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: meshahrv <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: c2h6 <c2h6@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/03 14:10:46 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/07/04 10:55:52 by meshahrv         ###   ########.fr       */
+/*   Updated: 2023/07/04 15:05:59 by c2h6             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,6 +120,7 @@ void Server::_runServer()
 	int pollRes;
 
 	/* Set up the initial listening socket */
+	std::cout << "listensocket: " << this->_listenSocket << std::endl;
 	serverFd.fd = this->_listenSocket;
 	serverFd.events = POLLIN | POLLOUT;
 	serverFd.revents = 0;
@@ -147,21 +148,27 @@ void Server::_runServer()
 					if (it->fd == this->_listenSocket)
 					{
 						this->_acceptConnection();
-
 						break;
 					}
 					this->_receiveData(it);
+					break ;
 				}
 				else if (it->revents & POLLHUP)
 				{
-					std::cerr << RED("Error: ") << "Client disconnected" << std::endl;
+					std::cerr << vert "Error: Client disconnected" fin << std::endl;
+					close(it->fd);
+                    this->_pollFd.erase(it);
 					break;
 				}
 				else if (it->revents & POLLERR)
 				{
 					std::cerr << RED("Error: ") << "poll() failed" << std::endl;
+					close(it->fd);
+                    this->_pollFd.erase(it);
 					break;
 				}
+				else if (it == this->_pollFd.end())
+					break;
 			}
 		}
 	}
@@ -185,7 +192,7 @@ void Server::_acceptConnection()
 		userPollFd.revents = 0;
 
 		this->_pollFd.push_back(userPollFd);
-		this->_user.insert(std::pair<int, User *>(userFd, new User()));
+		this->_user.insert(std::pair<int, User *>(userFd, new User(userFd, &userAddr)));
 		std::cout << GREEN("### Success ### ") << GREY("...accept()") << std::endl;
 		std::cout << YELLOW("[ USER LOGGED IN ]") << std::endl
 				  << std::endl;
@@ -195,11 +202,12 @@ void Server::_acceptConnection()
 void Server::_receiveData(pollfd_it &it)
 {
 
-	std::cout << BLUE("### RECIEVED DATA ###") << std::endl;
 	try
 	{
+		std::cout << BLUE("### RECIEVED DATA ###") << std::endl;
 		User *user = this->_user.at(it->fd);
-		int nbyte;
+		int nbyte = 0;
+
 
 		nbyte = this->_getData(user);
 		std::cout << GREY("byte sent: ") << nbyte << std::endl;
@@ -210,7 +218,7 @@ void Server::_receiveData(pollfd_it &it)
 				std::cerr << RED("Error: ") << "socket hung up" << std::endl;
 			else
 				std::cerr << RED("Error: ") << "recv()" << std::endl;
-			this->_deleteUser(it);
+			this->_deleteUser(it); // le pb arrive ici car on demande la suppression d'un user qui 
 		}
 		else
 			_chooseCmd(user);
@@ -229,6 +237,7 @@ int Server::_getData(User *user)
 	char buffer[1024];
 	std::string str;
 
+	user->clearMessage();
 	while (str.rfind("\r\n") != str.length() - 2 || str.length() < 2)
 	{
 		memset(buffer, 0, sizeof(buffer));
@@ -237,13 +246,10 @@ int Server::_getData(User *user)
 			break;
 		str.append(buffer);
 	}
-	if (str.length() > 0)
-	{
-		std::cout << GREEN("### Success ### ") << GREY("...recv()") << std::endl;
-		std::cout << YELLOW("[ MESSAGE RECEIVED : ") << str << YELLOW("]") << std::endl;
-	}
-	else
-		std::cerr << RED("Error: ") << "no message received" << std::endl;
+
+	std::cout << GREEN("### Success ### ") << GREY("...recv()") << std::endl;
+	std::cout << YELLOW("[ MESSAGE RECEIVED : ") << str << YELLOW("]") << std::endl;
+	user->setMessage(str); // did not set the message in the user
 
 	return (nbyte);
 }
@@ -253,6 +259,7 @@ void Server::_deleteUser(pollfd_it &it)
 
 	try
 	{
+		std::cout << vert "deleteUser: it->fd: " << it->fd << fin << std::endl;
 		User *user = this->_user.at(it->fd);
 		int fd = user->getUserFd();
 
@@ -265,8 +272,7 @@ void Server::_deleteUser(pollfd_it &it)
 	}
 	catch (const std::out_of_range &e)
 	{
-
-		std::cout << "out_of_range" << std::endl;
+		std::cout << vert "out_of_range from deleteUser" fin << std::endl;
 	}
 }
 
@@ -276,7 +282,8 @@ void Server::_indexingCmd()
 	_indexCmd.insert(std::pair<std::string, func>("PASS", &Server::_passCmd));
 	_indexCmd.insert(std::pair<std::string, func>("NICK", &Server::_nickCmd));
 	_indexCmd.insert(std::pair<std::string, func>("USER", &Server::_userCmd));
-	// _indexCmd.insert(std::pair<std::string, func>("PING", &Server::_pingCmd));
+	_indexCmd.insert(std::pair<std::string, func>("QUIT", &Server::_quitCmd));
+	_indexCmd.insert(std::pair<std::string, func>("PING", &Server::_pingCmd));
 }
 
 void Server::_chooseCmd(User *user)
@@ -284,6 +291,8 @@ void Server::_chooseCmd(User *user)
 	std::string msg = user->getMessage();
 	std::string cmd;
 	std::string buf;
+
+	// std::cout << WHITE("CHOOSE CMD!") << std::endl;
 
 	while (msg.length())
 	{
@@ -369,46 +378,40 @@ void Server::_caplsCmd(User *user, std::string param)
 
 void Server::_passCmd(User *user, std::string param)
 {
-	(void)user;
-	(void)param;
 	if (user->hasBeenWelcomed())
 		return (user->sendReply("Error: pass: already welcomed"));
 	if (!param.length())
 		return (user->sendReply("Error: pass: empty"));
-	// if (param.compare(_password))
-	// {
-	// 	user->setPassword(false);
-	// 	return (user->sendReply(ERR_PASSWDMISMATCH(user->getNickname())));
-	// }
+	if (param.compare(_password))
+	{
+		user->setPassword(false);
+		return (user->sendReply(ERR_PASSWDMISMATCH(user->getNickname())));
+	}
 	user->setPassword(true);
 }
 
 void Server::_nickCmd(User *user, std::string param)
 {
-	// (void)user;
-	// (void)param;
-	// if (param.empty())
-	// 	return (user->sendReply(ERR_NONICKNAMEGIVEN(param)));
+	if (param.empty())
+		return (user->sendReply(ERR_NONICKNAMEGIVEN(param)));
 	// if (!valid_user_name(param))
 	// 	return (user->sendReply(ERR_NONICKNAMEGIVEN(param)));
 	if (param.find(' ') != std::string::npos)
 		param = param.substr(0, param.find_first_of(' '));
-	// for (users_iterator it = _user.begin(); it != _user.end(); ++it)
-	// {
-	// 	if (it->second->getNickname() == param)
-	// 		return (user->sendReply(ERR_NICKCOLLISION()));
-	// }
+	for (users_iterator it = _user.begin(); it != _user.end(); ++it)
+	{
+		if (it->second->getNickname() == param)
+			return (user->sendReply(ERR_NICKCOLLISION()));
+	}
 	user->setNickname(param);
 }
 
 void Server::_userCmd(User *user, std::string param)
 {
-	// (void)user;
-	// (void)param;
-	// if (user->hasBeenWelcomed())
-	// 	return (user->sendReply(ERR_ALREADYREGISTRED(user->getNickname())));
-	// if (param.empty())
-	// 	return (user->sendReply(ERR_NEEDMOREPARAMS(user->getNickname(), "")));
+	if (user->hasBeenWelcomed())
+		return (user->sendReply(ERR_ALREADYREGISTRED(user->getNickname())));
+	if (param.empty())
+		return (user->sendReply(ERR_NEEDMOREPARAMS(user->getNickname(), "")));
 	std::string username = param.substr(0, param.find(' '));
 	std::string mode = param.substr(param.find(' ') + 1, param.find(' ', param.find(' ') + 1) - param.find(' ') - 1);
 	std::string unused = param.substr(param.find(' ', param.find(' ') + 1) + 1, param.find(' ', param.find(' ', param.find(' ') + 1) + 1) - param.find(' ', param.find(' ') + 1) - 1);
@@ -417,11 +420,54 @@ void Server::_userCmd(User *user, std::string param)
 		realname = "";
 	else
 		realname = param.substr(param.find(':', param.find(' ', param.find(' ') + 1) + 1) + 1);
-	// if (realname == "" || mode == "" || username == "")
-	// 	return (user->sendReply(ERR_NEEDMOREPARAMS(user->getNickname(), param)));
+	if (realname == "" || mode == "" || username == "")
+		return (user->sendReply(ERR_NEEDMOREPARAMS(user->getNickname(), param)));
 	user->setRealname(realname);
 	user->setUsername(mode);
 	user->setHostname(unused);
 	if (user->getNickname().size() && user->getPassword() && !user->hasBeenWelcomed())
 		user->welcome();
+}
+
+void	Server::_pingCmd(User *user, std::string param){
+	if (param.empty())
+		return (user->sendReply(ERR_NEEDMOREPARAMS(user->getNickname(), param)));
+	if (param != "localhost" && param != "IRC") // change localhost to _hostname variable
+		return (user->sendReply(ERR_NOSUCHSERVER(user->getNickname(), param)));
+	user->sendReply(RPL_PONG(user->getNickname(), param));
+}
+
+//added this function to quit the server when the user types /quit
+void	Server::_quitCmd(User *user, std::string param)
+{
+	if (param.empty())
+		param = "No reason given by user";
+	
+	for (users_iterator it = _user.begin(); it != _user.end(); ++it)
+	{
+		if (it->second->getNickname() != user->getNickname())
+			it->second->sendReply(":" + user->getNickname() + "!d@" + "localhost" + " QUIT :Quit: " + param + ";\n" + user->getNickname() + " is exiting the network with the message: \"Quit: " + param + "\"");
+	}
+	try
+	{
+		int	fd = user->getUserFd();
+		close(fd);
+		for (pollfd_it it = _pollFd.begin(); it != _pollFd.end(); ++it)
+		{
+			if (fd == it->fd)
+			{
+				std::cout << rouge "ERASING user on socket " << fd << fin << std::endl;
+				_pollFd.erase(it);
+				break;
+			}
+		}
+		_user.erase(fd);
+		std::cout << rouge "ERASING user with socket " << fd << fin << std::endl;
+
+		delete user;
+		std::cout << rouge "Disconnecting user on socket " << fd << fin << std::endl;
+	}
+	catch (const std::out_of_range &e) {
+		std::cout << vert "ERROR c'est ici que je rentre" fin << std::endl;
+	}
 }

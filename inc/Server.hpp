@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: meshahrv <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: c2h6 <c2h6@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/03 14:10:07 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/07/04 11:03:00 by meshahrv         ###   ########.fr       */
+/*   Updated: 2023/07/04 12:23:43 by c2h6             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,8 @@ class Server {
 		void	_passCmd(User *user, std::string param);
 		void	_nickCmd(User *user, std::string param);
 		void	_userCmd(User *user, std::string param);
+		void	_pingCmd(User *user, std::string param);
+		void	_quitCmd(User *user, std::string param);
 
 		
 	public:

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   User.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: meshahrv <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: c2h6 <c2h6@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/03 18:45:15 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/07/04 11:04:50 by meshahrv         ###   ########.fr       */
+/*   Updated: 2023/07/04 15:15:55 by c2h6             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,8 @@ User::User() {
 
 }
 
-User::User(int fd, struct sockaddr_storage *userAddr) {
+// une des erreurs etait lié aux variables non initialisées et essentiel pour la suite.
+User::User(int fd, struct sockaddr_storage *userAddr) : _password(false), _welcomed(false), _hostname("localhost"), _server("IRC") {
 
     this->_fd = fd;
     this->_userAddr = userAddr;
@@ -127,4 +128,8 @@ std::string User::timestamp()
 	strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
 	
 	return (buf);
+}
+
+void	User::clearMessage(){
+	_message.clear();
 }
