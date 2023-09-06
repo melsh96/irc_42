@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: meshahrv <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/03 14:10:07 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/07/04 17:35:18 by meshahrv         ###   ########.fr       */
+/*   Updated: 2023/09/06 18:49:44 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,10 @@
 #include "Color.hpp"
 #include "User.hpp"
 #include "Messages.hpp"
+#include "Channel.hpp"
 
 class User;
+class Channel;
 
 class Server {
 	
@@ -45,6 +47,8 @@ class Server {
 		std::vector<struct pollfd>   	_pollFd;
 		std::map<int, User *>   		_user;
 		std::map<std::string, func>   	_indexCmd;
+
+		std::map<std::string, Channel *> _channels;
 
 		void    						_createServer(void);
 		void							_runServer();
@@ -63,6 +67,7 @@ class Server {
 		void							_userCmd(User *user, std::string param);
 		void							_pingCmd(User *user, std::string param);
 		void							_quitCmd(User *user, std::string param);
+		void							_joinCmd(User *user, std::string param);
 
 		void							_clean();
 

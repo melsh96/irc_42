@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerCmds.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: meshahrv <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 16:23:13 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/04 17:28:31 by meshahrv         ###   ########.fr       */
+/*   Updated: 2023/09/06 18:55:35 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ void Server::_indexingCmd()
 	_indexCmd.insert(std::pair<std::string, func>("USER", &Server::_userCmd));
 	_indexCmd.insert(std::pair<std::string, func>("QUIT", &Server::_quitCmd));
 	_indexCmd.insert(std::pair<std::string, func>("PING", &Server::_pingCmd));
+	_indexCmd.insert(std::pair<std::string, func>("JOIN", &Server::_joinCmd));
 }
 
 void Server::_parseCmd(User *user)
@@ -187,3 +188,45 @@ void	Server::_quitCmd(User *user, std::string param)
 	}
 }
 
+void	Server::_joinCmd(User *user, std::string param)
+{
+	std::map<std::string, std::string>	channel;
+	std::string chans;
+	std::string keys;
+	chans = param.substr(0, param.find(' '));
+	keys = param.substr(param.find(' ') + 1);
+	size_t pos1 = 0;
+	size_t pos2 = 0;
+	while ((pos1 = chans.find(',')) != std::string::npos)
+	{
+		std::string token1 = chans.substr(0, pos1);
+		if ((pos2 = keys.find(',')) != std::string::npos)
+		{
+			std::string token2 = keys.substr(0, pos2);
+			channel[token1] = token2;
+			keys.erase(0, pos2 + 1);
+		}
+		else
+			channel[token1] = '\0';
+		chans.erase(0, pos1 + 1);
+	}
+	if (!chans.empty() || !keys.empty())
+		std::cout << rouge << "Probleme format JOIN - channel/keys" << fin << std::endl;
+	std::map<std::string, std::string>::iterator it = channel.begin();
+	while (it != channel.end())
+	{
+		if (this->_channels.find(it->first) != this->_channels.end())
+		{
+			// join channel
+			this->_channels[it->first]->joinChannel(it->second, user);
+			// Check if join or not;
+		}
+		else
+		{
+			// create channel
+			this->_channels[it->first] = new Channel(it->first, it->second, user);
+		}
+		user->sendReply((user->getNickname() + " JOIN " + it->first));
+		it++;
+	}
+}
