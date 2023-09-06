@@ -6,7 +6,7 @@
 /*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 16:23:13 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/06 18:55:35 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/06 19:42:57 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -193,25 +193,34 @@ void	Server::_joinCmd(User *user, std::string param)
 	std::map<std::string, std::string>	channel;
 	std::string chans;
 	std::string keys;
-	chans = param.substr(0, param.find(' '));
-	keys = param.substr(param.find(' ') + 1);
+	if (param.find(' ') != std::string::npos)
+	{
+		chans = param.substr(0, param.find(' '));
+		keys = param.substr(param.find(' ') + 1);
+	}
+	else
+		chans = param;
 	size_t pos1 = 0;
 	size_t pos2 = 0;
-	while ((pos1 = chans.find(',')) != std::string::npos)
+	while (!chans.empty())
 	{
-		std::string token1 = chans.substr(0, pos1);
-		if ((pos2 = keys.find(',')) != std::string::npos)
+		if ((pos1 = chans.find(',')) != std::string::npos)
 		{
-			std::string token2 = keys.substr(0, pos2);
-			channel[token1] = token2;
-			keys.erase(0, pos2 + 1);
+			std::string token1 = chans.substr(0, pos1);
+			if ((pos2 = keys.find(',')) != std::string::npos)
+			{
+				std::string token2 = keys.substr(0, pos2);
+				channel[token1] = token2;
+				keys.erase(0, pos2 + 1);
+			}
+			else
+				channel[token1] = '\0';
+			chans.erase(0, pos1 + 1);
 		}
-		else
-			channel[token1] = '\0';
-		chans.erase(0, pos1 + 1);
+		channel[chans] = keys;
+		chans.clear();
+		keys.clear();
 	}
-	if (!chans.empty() || !keys.empty())
-		std::cout << rouge << "Probleme format JOIN - channel/keys" << fin << std::endl;
 	std::map<std::string, std::string>::iterator it = channel.begin();
 	while (it != channel.end())
 	{
@@ -226,7 +235,7 @@ void	Server::_joinCmd(User *user, std::string param)
 			// create channel
 			this->_channels[it->first] = new Channel(it->first, it->second, user);
 		}
-		user->sendReply((user->getNickname() + " JOIN " + it->first));
+		user->sendReply(':' + user->getNickname() + " JOIN " + it->first);
 		it++;
 	}
 }
