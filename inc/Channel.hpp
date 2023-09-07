@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 17:16:21 by fbily             #+#    #+#             */
-/*   Updated: 2023/09/07 17:26:59 by zhamdouc         ###   ########.fr       */
+/*   Updated: 2023/09/07 17:31:22 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ class Channel
 		bool				_inviteMode;
 		// bool				_topicMode;
 		// bool				_opMode;
-		// unsigned int		_maxUsers;
+		unsigned int		_maxUsers;
 		unsigned int		_nbUser;
 		std::vector<User *>	_Users;
 		std::vector<User *> _Operators;
