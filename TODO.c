@@ -6,7 +6,7 @@
 /*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/07 13:32:43 by fbily             #+#    #+#             */
-/*   Updated: 2023/09/07 14:18:28 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/07 16:25:16 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,24 +34,7 @@ A savoir :
 
 Messages to add :
 
-	- ERR_BADCHANNELKEY
-	- ERR_CHANNELISFULL
-	- ERR_INVITEONLYCHAN			<<<< All for /JOIN
-	- RPL_TOPIC
-	- RPL_NOTOPIC
-	- RPL_NAMEREPLY
-	- RPL_ENDOFNAMES
-
-	- ERR_NOSUCHCHANNEL				<<<<< PART / PRIVMSG / MODE / KICK
-
-	- ERR_CHANOPRIVSNEEDED
-	- ERR_USERNOTINCHANNEL			<<<<<< KICK
-	- ERR_NOTONCHANNEL
-
 	- RPL_TOPICWHOTIME				<<<<< TOPIC (+ JOIN ?)
-	
-	- RPL_INVITING
-	- ERR_USERONCHANNEL				<<<<< INVITE
 
 	- RPL_UMODEIS
 	- ERR_UMODEUNKNOWFLAG

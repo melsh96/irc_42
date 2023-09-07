@@ -6,7 +6,7 @@
 /*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 16:23:13 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/06 19:42:57 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/07 17:19:18 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,7 +114,7 @@ void    Server::_nickCmd(User *user, std::string param)
 	for (users_iterator it = _user.begin(); it != _user.end(); ++it)
 	{
 		if (it->second->getNickname() == param)
-			return (user->sendReply(ERR_NICKCOLLISION()));
+			return (user->sendReply(ERR_NICKCOLLISION(param)));
 	}
 	std::string oldname =user->getNickname();
 	user->setNickname(param);
@@ -125,7 +125,7 @@ void    Server::_nickCmd(User *user, std::string param)
 void    Server::_userCmd(User *user, std::string param)
 {
 	if (user->hasBeenWelcomed())
-		return (user->sendReply(ERR_ALREADYREGISTRED(user->getNickname())));
+		return (user->sendReply(ERR_ALREADYREGISTERED(user->getNickname())));
 	if (param.empty())
 		return (user->sendReply(ERR_NEEDMOREPARAMS(user->getNickname(), "")));
 	std::string username = param.substr(0, param.find(' '));
