@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
+/*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/03 14:10:07 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/06 18:49:44 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/07 18:37:29 by zhamdouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,7 @@ class Server {
 		void							_pingCmd(User *user, std::string param);
 		void							_quitCmd(User *user, std::string param);
 		void							_joinCmd(User *user, std::string param);
+		void							_inviteCmd(User *user, std::string param);
 
 		void							_clean();
 

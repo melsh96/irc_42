@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
+/*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 17:28:51 by fbily             #+#    #+#             */
-/*   Updated: 2023/09/07 17:31:43 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/07 19:02:14 by zhamdouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,12 +51,64 @@ std::string Channel::getTopic() const
 	return (this->_topic);
 }
 
-void	Channel::joinChannel(std::string key, User *user)
+std::string	Channel::joinChannel(std::string key, User *user)
 {
-	if ()
+	if (_inviteMode ==  true)
+	{
+		if (foundInvited(user->getNickname()) == false)
+			return (ERR_INVITEONLYCHAN(user->getNickname(), this->getName()));//il est pas invite ce batard  
+	}
+	if (this->_nbUser >= this->_maxUsers)
+		return (ERR_CHANNELISFULL(user->getNickname(), this->getName()));//erreur plus de place
+	
 	if (key == this->_key) // Check aussi limits user ?
 	{
 		this->_Users.push_back(user);
 		this->_nbUser++;
+		return (':' + user->getNickname() + " JOIN " + this->getName());
 	}
+	else
+		return (ERR_BADCHANNELKEY(user->getNickname(), this->getName()));//erreur de mot de passe 
+}
+
+bool Channel::foundUser(std::string nickname)
+{
+	std::vector<User *>::iterator it = this->_Users.begin();
+	while (it != this->_Users.end())
+	{
+		if (nickname != (*it)->getNickname())
+			it++;
+		else
+			return (true);//trouve 
+	}
+	if (it == this->_Users.end())
+		return (false);//pas trouver donc probleme
+}
+
+bool Channel::foundOperator(std::string nickname)
+{
+	std::vector<User *>::iterator it = this->_Operators.begin();
+	while (it != this->_Operators.end())
+	{
+		if (nickname != (*it)->getNickname())
+			it++;
+		else
+			return (true);
+	}
+	if (it == this->_Operators.end())
+		return(false);
+}
+
+bool Channel::foundInvited(std::string nickname)
+{
+	std::vector<User *>::iterator it = this->_Invited.begin();
+	while (it != this->_Invited.end())
+	{
+		if (nickname != (*it)->getNickname())
+			it++;
+		else
+			return (true);
+	}
+	if (it == this->_Invited.end())
+		return(false);
 }

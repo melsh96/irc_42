@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerCmds.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
+/*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 16:23:13 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/07 17:19:18 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/07 19:14:47 by zhamdouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ void Server::_indexingCmd()
 	_indexCmd.insert(std::pair<std::string, func>("QUIT", &Server::_quitCmd));
 	_indexCmd.insert(std::pair<std::string, func>("PING", &Server::_pingCmd));
 	_indexCmd.insert(std::pair<std::string, func>("JOIN", &Server::_joinCmd));
+	_indexCmd.insert(std::pair<std::string, func>("INVITE", &Server::_inviteCmd));
 }
 
 void Server::_parseCmd(User *user)
@@ -227,15 +228,45 @@ void	Server::_joinCmd(User *user, std::string param)
 		if (this->_channels.find(it->first) != this->_channels.end())
 		{
 			// join channel
-			this->_channels[it->first]->joinChannel(it->second, user);
-			// Check if join or not;
+			std::string result = this->_channels[it->first]->joinChannel(it->second, user);
+			user->sendReply(result);
 		}
 		else
 		{
 			// create channel
 			this->_channels[it->first] = new Channel(it->first, it->second, user);
+			user->sendReply(':' + user->getNickname() + " JOIN " + it->first);
 		}
-		user->sendReply(':' + user->getNickname() + " JOIN " + it->first);
 		it++;
 	}
+}
+
+void	Server::_inviteCmd(User *user, std::string param)
+{
+	std::map<std::string, std::string>	channel;
+	std::string chans;
+	std::string guest;
+	if (param.find(' ') != std::string::npos)
+	{
+		guest = param.substr(0, param.find(' '));
+		chans = param.substr(param.find(' ') + 1);
+	}
+	else
+		return ;//il manque un argument batard
+	// verifier que guest existe, et recuperer le pointeur pour pouvoir add
+	if (this->_channels.find(chans) != this->_channels.end())
+	{
+		//  channel finded
+		if (this->_channels[chans]->foundUser(user->getNickname()) == true)
+			return ();//celui qui invite ne doit pas etre un user mais un operateur
+		else if (this->_channels[chans]->foundOperator(user->getNickname()) == false)
+			return ();//doit etre dans le channel 
+		if (this->_channels[chans]->foundUser(guest) == true || this->_channels[chans]->foundOperator(guest) == true)
+			return ();//guest est dans le channel
+		if (this->_channels[chans]->foundInvited(guest) == false)
+			// this->_channels[chans]->addGuest(User *user);
+		//return (user->sendReply());
+	}
+	else
+		return ;// channel non trouver
 }

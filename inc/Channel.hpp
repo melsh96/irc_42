@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
+/*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 17:16:21 by fbily             #+#    #+#             */
-/*   Updated: 2023/09/07 17:31:22 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/07 19:02:26 by zhamdouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ class Channel
 		unsigned int		_nbUser;
 		std::vector<User *>	_Users;
 		std::vector<User *> _Operators;
+		std::vector<User *> _Invited;
 		Channel();
 		Channel(const Channel& obj);
 		Channel& operator=(const Channel& rhs);
@@ -39,11 +40,14 @@ class Channel
 		Channel(std::string name, std::string key, User *user);
 		~Channel();
 
-		std::string	getName() const;
-		std::string getTopic() const;
+		std::string		getName() const;
+		std::string 	getTopic() const;
 		
-		void		joinChannel(std::string key, User *user);
-		void		inviteChannel();
+		std::string		joinChannel(std::string key, User *user);
+		bool 			foundInvited(std::string nickname);
+		bool 			foundUser(std::string nickname);
+		bool 			foundOperator(std::string nickname);
+		//ajouter avant a la liste les invites 
 		
 };
 
