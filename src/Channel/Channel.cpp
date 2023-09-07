@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
+/*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 17:28:51 by fbily             #+#    #+#             */
-/*   Updated: 2023/09/06 18:43:35 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/07 17:28:25 by zhamdouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ Channel::Channel(const Channel& obj)
 	(void)obj;
 }
 
-Channel::Channel(std::string name, std::string key, User *user) : _name(name), _key(key), _nbUser(1)
+Channel::Channel(std::string name, std::string key, User *user) : _name(name), _key(key), _inviteMode(false),_nbUser(1)
 {
 	this->_Operators.push_back(user);
 	//Set les autres variable : voir doc pour cas par default
@@ -53,6 +53,7 @@ std::string Channel::getTopic() const
 
 void	Channel::joinChannel(std::string key, User *user)
 {
+	if ()
 	if (key == this->_key) // Check aussi limits user ?
 	{
 		this->_Users.push_back(user);

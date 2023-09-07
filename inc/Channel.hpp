@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
+/*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 17:16:21 by fbily             #+#    #+#             */
-/*   Updated: 2023/09/07 16:55:02 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/07 17:26:59 by zhamdouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ class Channel
 		std::string			_name;
 		std::string			_topic;
 		std::string			_key;
-		// bool				_inviteMode;
+		bool				_inviteMode;
 		// bool				_topicMode;
 		// bool				_opMode;
 		// unsigned int		_maxUsers;
@@ -43,6 +43,7 @@ class Channel
 		std::string getTopic() const;
 		
 		void		joinChannel(std::string key, User *user);
+		void		inviteChannel();
 		
 };
 
