@@ -6,7 +6,7 @@
 /*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 17:16:21 by fbily             #+#    #+#             */
-/*   Updated: 2023/09/06 18:42:14 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/07 13:31:50 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,25 +47,3 @@ class Channel
 };
 
 #endif
-
-/* 
-Fonctions a faire :
-	- JOIN EN PRIO
-	- Invite
-	- Kick
-	- Topic
-	- Mode :
-				-i (set/unset invite only)
-				-t ()
-				-k (set/unset key)
-				-o (Give/Take operator privilege)
-				-l (set/unset user limit)
-	- Map dans serveur.cpp => std::map<string, channel*> [name] = *channel;
-	
-A savoir :
-	- Recoit on les user* a inviter ? Ex : Zak invite Flo sur channel 42 => On recoit Zak mais Flo ?
-	- Variable par default pour creation channel
-
-/!\ Savoir pour les leaks Channel en fin d'exec /!\
-
- */
