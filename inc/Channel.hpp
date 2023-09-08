@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 17:16:21 by fbily             #+#    #+#             */
-/*   Updated: 2023/09/08 19:22:16 by zhamdouc         ###   ########.fr       */
+/*   Updated: 2023/09/08 20:04:02 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,8 @@ class Channel
 		bool 			foundOperator(std::string nickname);
 		void			addGuest(User *user);
 		void			sendMessage(User *user, std::string message);
-		void			kickUser(std::string target, std::string comment);
+		void			kickUser(User *user, std::string target, std::string comment);
+		void			listUsersOnChannel(User *user);
 
 		//ajouter avant a la liste les invites 
 		

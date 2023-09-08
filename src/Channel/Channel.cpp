@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 17:28:51 by fbily             #+#    #+#             */
-/*   Updated: 2023/09/08 19:22:11 by zhamdouc         ###   ########.fr       */
+/*   Updated: 2023/09/08 20:17:28 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,17 +134,38 @@ void Channel::sendMessage( User *user , std::string message)
 	}
 }
 
-void	Channel::kickUser(std::string target, std::string comment)
+void	Channel::kickUser(User *user, std::string target, std::string comment)
 {
 	std::vector<User *>::iterator	it = this->_Users.begin();
 	while (it != this->_Users.end())
 	{
 		if ((*it)->getNickname() == target)
 		{
-			(*it)->sendReply("KICK " + this->_name + ' ' + target + ' ' + comment);
+			this->sendMessage(user, ":" + user->getNickname() + " KICK " + this->_name + ' ' + target + ' ' + comment);
+			user->sendReply(":" + user->getNickname() + " KICK " + this->_name + ' ' + target + ' ' + comment);
 			this->_Users.erase(it);
 			break ;
 		}
 		it++;
 	}
+}
+
+void	Channel::listUsersOnChannel(User *user)
+{
+	std::string result;
+	result.append(":" + user->getServer() + " 353 " + user->getNickname() + " = " + this->getName() + " :");
+	std::vector<User *>::iterator it = this->_Operators.begin();
+	while (it != this->_Operators.end())
+	{
+		result.append('@' + (*it)->getNickname() + ' ');
+		it++;
+	}
+	it = this->_Users.begin();
+	while (it != this->_Users.end())
+	{
+		result.append((*it)->getNickname() + ' ');
+		it++;
+	}
+	user->sendReply(result);
+	user->sendReply(":" + user->getServer() + " 366 " + user->getNickname() + ' ' + this->getName() + " :End of /NAMES list");
 }

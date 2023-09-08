@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerCmds.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 16:23:13 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/08 19:22:05 by zhamdouc         ###   ########.fr       */
+/*   Updated: 2023/09/08 20:26:45 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -234,12 +234,20 @@ void	Server::_joinCmd(User *user, std::string param)
 			// join channel
 			std::string result = this->_channels[it->first]->joinChannel(it->second, user);
 			user->sendReply(result);
+			if (result == (':' + user->getNickname() + " JOIN " + it->first))
+			{
+				this->_channels[it->first]->sendMessage(user, result);
+				user->sendReply(":" + user->getServer() + " 332 " + user->getNickname() + ' ' + it->first + " :" + this->_channels[it->first]->getTopic());
+				this->_channels[it->first]->listUsersOnChannel(user);
+			}
 		}
 		else
 		{
 			// create channel
 			this->_channels[it->first] = new Channel(it->first, it->second, user);
 			user->sendReply(':' + user->getNickname() + " JOIN " + it->first);
+			user->sendReply(":" + user->getServer() + " 332 " + user->getNickname() + ' ' + it->first + " :" + this->_channels[it->first]->getTopic());
+			this->_channels[it->first]->listUsersOnChannel(user);
 		}
 		it++;
 	}
@@ -344,5 +352,5 @@ void	Server::_kickCmd(User *user, std::string param)
 		return (user->sendReply(ERR_USERNOTINCHANNEL(user->getNickname(), channel, target)));
 	if (this->_channels[channel]->foundOperator(user->getNickname()) == false)
 		return (user->sendReply(ERR_CHANOPRIVSNEEDED(user->getNickname(), channel)));
-	this->_channels[channel]->kickUser(target, comment);
+	this->_channels[channel]->kickUser(user, target, comment);
 }
