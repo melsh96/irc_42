@@ -6,7 +6,7 @@
 /*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 16:23:13 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/08 12:17:53 by zhamdouc         ###   ########.fr       */
+/*   Updated: 2023/09/08 15:18:14 by zhamdouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ void Server::_indexingCmd()
 	_indexCmd.insert(std::pair<std::string, func>("PING", &Server::_pingCmd));
 	_indexCmd.insert(std::pair<std::string, func>("JOIN", &Server::_joinCmd));
 	_indexCmd.insert(std::pair<std::string, func>("INVITE", &Server::_inviteCmd));
+	_indexCmd.insert(std::pair<std::string, func>("PRIVMSG", &Server::_inviteCmd));
 }
 
 void Server::_parseCmd(User *user)
@@ -280,4 +281,9 @@ void	Server::_inviteCmd(User *user, std::string param)
 	}
 	else
 		return (user->sendReply(ERR_NOSUCHCHANNEL(user->getNickname(), chans)));// channel non trouver
+}
+
+void	Server::_privmsgCmd(User *user, std::string param)
+{
+	
 }

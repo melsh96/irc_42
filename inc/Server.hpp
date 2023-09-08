@@ -6,7 +6,7 @@
 /*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/03 14:10:07 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/07 18:37:29 by zhamdouc         ###   ########.fr       */
+/*   Updated: 2023/09/08 15:18:36 by zhamdouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,7 @@ class Server {
 		void							_quitCmd(User *user, std::string param);
 		void							_joinCmd(User *user, std::string param);
 		void							_inviteCmd(User *user, std::string param);
+		void							_privmsgCmd(User *user, std::string param);
 
 		void							_clean();
 

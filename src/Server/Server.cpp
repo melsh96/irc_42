@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: meshahrv <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/03 14:10:46 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/07/04 17:43:48 by meshahrv         ###   ########.fr       */
+/*   Updated: 2023/09/08 15:04:02 by zhamdouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -247,7 +247,7 @@ int Server::_getData(User *user)
 		if (nbyte <= 0)
 			break;
 		str.append(buffer);
-	}
+	} 
 
 	std::cout << GREEN("### Success ### ") << GREY("...recv()") << std::endl;
 	std::cout << YELLOW("[ MESSAGE RECEIVED : ") << str << YELLOW("]") << std::endl << std::endl;
