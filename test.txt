@@ -1,0 +1,3 @@
+verifier ce qu'on fait quand il y a pas de param : 
+	/join "     "
+	

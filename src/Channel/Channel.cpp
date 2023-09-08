@@ -6,11 +6,11 @@
 /*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 17:28:51 by fbily             #+#    #+#             */
-/*   Updated: 2023/09/07 19:02:14 by zhamdouc         ###   ########.fr       */
+/*   Updated: 2023/09/08 12:15:03 by zhamdouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Channel.hpp"
+#include "../../inc/Channel.hpp"
 
 /******		Constructors	******/
 
@@ -61,7 +61,7 @@ std::string	Channel::joinChannel(std::string key, User *user)
 	if (this->_nbUser >= this->_maxUsers)
 		return (ERR_CHANNELISFULL(user->getNickname(), this->getName()));//erreur plus de place
 	
-	if (key == this->_key) // Check aussi limits user ?
+	if (key == this->_key)
 	{
 		this->_Users.push_back(user);
 		this->_nbUser++;
@@ -111,4 +111,9 @@ bool Channel::foundInvited(std::string nickname)
 	}
 	if (it == this->_Invited.end())
 		return(false);
+}
+
+void Channel::addGuest(User *user)
+{
+	this->_Invited.push_back(user);
 }

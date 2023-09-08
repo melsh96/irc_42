@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   User.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: c2h6 <c2h6@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/03 18:51:42 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/07/04 11:25:42 by c2h6             ###   ########.fr       */
+/*   Updated: 2023/09/08 11:19:37 by zhamdouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ class User {
 		~User();
 
 		int 						getUserFd();
+		std::string					getServer();
 		std::string                 getUsername(void);
 		std::string                 getNickname(void);
 		std::string                 getHostname(void);

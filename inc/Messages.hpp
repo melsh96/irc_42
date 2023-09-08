@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Messages.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
+/*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 10:58:08 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/07 17:19:24 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/08 12:15:14 by zhamdouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,5 +42,6 @@ std::string ERR_USERNOTINCHANNEL(std::string nick, std::string channel, std::str
 std::string ERR_NOTONCHANNEL(std::string nick, std::string channel);
 std::string ERR_USERONCHANNEL(std::string nick, std::string channel, std::string user);
 std::string ERR_UMODEUNKNOWNFLAG(std::string nick);
+std::string ERR_NOSUCHNICK(std::string nick, std::string user);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 16:23:13 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/07 19:14:47 by zhamdouc         ###   ########.fr       */
+/*   Updated: 2023/09/08 12:17:53 by zhamdouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -194,6 +194,8 @@ void	Server::_joinCmd(User *user, std::string param)
 	std::map<std::string, std::string>	channel;
 	std::string chans;
 	std::string keys;
+	if (param.empty())
+		return (user->sendReply(ERR_NEEDMOREPARAMS(user->getNickname(), param)));
 	if (param.find(' ') != std::string::npos)
 	{
 		chans = param.substr(0, param.find(' '));
@@ -252,21 +254,30 @@ void	Server::_inviteCmd(User *user, std::string param)
 		chans = param.substr(param.find(' ') + 1);
 	}
 	else
-		return ;//il manque un argument batard
+		return (user->sendReply(ERR_NEEDMOREPARAMS(user->getNickname(), param)));//verifier si j'envoie les bon argument (est ce qu'il faut renvoyer Param)
 	// verifier que guest existe, et recuperer le pointeur pour pouvoir add
+	std::map<int, User *>::iterator it;
+	for(it = this->_user.begin(); it != this->_user.end(); it++)
+	{
+		if(it->second->getNickname() == guest)
+			break;
+	}
+	if (it == this->_user.end())
+		return(user->sendReply(ERR_NOSUCHNICK(user->getNickname(), guest)));
 	if (this->_channels.find(chans) != this->_channels.end())
 	{
 		//  channel finded
 		if (this->_channels[chans]->foundUser(user->getNickname()) == true)
-			return ();//celui qui invite ne doit pas etre un user mais un operateur
+			return (user->sendReply(ERR_CHANOPRIVSNEEDED(user->getNickname(), this->_channels[chans]->getName())));//celui qui invite ne doit pas etre un user mais un operateur
 		else if (this->_channels[chans]->foundOperator(user->getNickname()) == false)
-			return ();//doit etre dans le channel 
-		if (this->_channels[chans]->foundUser(guest) == true || this->_channels[chans]->foundOperator(guest) == true)
-			return ();//guest est dans le channel
-		if (this->_channels[chans]->foundInvited(guest) == false)
-			// this->_channels[chans]->addGuest(User *user);
-		//return (user->sendReply());
+			return (user->sendReply(ERR_NOTONCHANNEL(user->getNickname(), this->_channels[chans]->getName())));//doit etre dans le channel 
+		if (this->_channels[chans]->foundUser(it->second->getNickname()) == true || this->_channels[chans]->foundOperator(it->second->getNickname()) == true)
+			return (user->sendReply(ERR_USERONCHANNEL(user->getNickname(), this->_channels[chans]->getName(), it->second->getNickname())));//verifier que j'ai envoyer les bon parametre, le guest ici est deja inscrit dans le channel 
+		if (this->_channels[chans]->foundInvited(it->second->getNickname()) == false)
+			this->_channels[chans]->addGuest(it->second);
+		//c'est lorsque le Guest essaiera de join qu'on verifiera si le channel est full ou non 
+		return (user->sendReply(RPL_INVITING(user->getNickname(), user->getServer(), this->_channels[chans]->getName(), it->second->getNickname())));//je suis pas sur des argument envoyer 
 	}
 	else
-		return ;// channel non trouver
+		return (user->sendReply(ERR_NOSUCHCHANNEL(user->getNickname(), chans)));// channel non trouver
 }

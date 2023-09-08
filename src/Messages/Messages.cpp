@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Messages.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
+/*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 10:57:59 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/07 17:18:10 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/08 12:08:48 by zhamdouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,4 +136,10 @@ std::string ERR_USERONCHANNEL(std::string nick, std::string channel, std::string
 //"<client> :Unknown MODE flag"
 std::string ERR_UMODEUNKNOWNFLAG(std::string nick){
 	return ("501 " + nick + "Unknown MODE flag");
+}
+
+//ajouter l'erreur 404 cannot send a message to a Channel
+std::string ERR_NOSUCHNICK(std::string nick, std::string user)
+{
+	return ("401 " + nick + " " + user + " :No such nick/channel");
 }
