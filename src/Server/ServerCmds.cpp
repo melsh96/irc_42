@@ -6,7 +6,7 @@
 /*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 16:23:13 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/08 17:56:00 by zhamdouc         ###   ########.fr       */
+/*   Updated: 2023/09/08 19:22:05 by zhamdouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ void Server::_indexingCmd()
 	_indexCmd.insert(std::pair<std::string, func>("JOIN", &Server::_joinCmd));
 	_indexCmd.insert(std::pair<std::string, func>("INVITE", &Server::_inviteCmd));
 	_indexCmd.insert(std::pair<std::string, func>("PRIVMSG", &Server::_privmsgCmd));
+	_indexCmd.insert(std::pair<std::string, func>("KICK", &Server::_kickCmd));
 }
 
 void Server::_parseCmd(User *user)
@@ -322,4 +323,26 @@ void	Server::_privmsgCmd(User *user, std::string param)
 		return ;
 	}
 	std::cout << rouge << (":" + user->getNickname() + " PRIVMSG " + target + " " + text) << fin << std::endl;
+}
+
+void	Server::_kickCmd(User *user, std::string param)
+{
+	std::string channel;
+	std::string target;
+	std::string comment;
+	
+	channel = param.substr(0, param.find(' '));
+	target = param.substr(param.find(' ') + 1);
+	comment = target.substr(target.find(' ') + 1);
+	target.erase(target.find(' '), comment.length() + 1);
+	if (comment.length() == 1)	
+		comment = "kicked for no reason, sorry bro.";
+	std::cout << rouge << channel << '\n' << target << '\n' << comment << '\n' << fin;
+	if (this->_channels.find(channel) == this->_channels.end())
+		return (user->sendReply(ERR_NOSUCHCHANNEL(user->getNickname(), channel)));
+	if (this->_channels[channel]->foundUser(target) == false)
+		return (user->sendReply(ERR_USERNOTINCHANNEL(user->getNickname(), channel, target)));
+	if (this->_channels[channel]->foundOperator(user->getNickname()) == false)
+		return (user->sendReply(ERR_CHANOPRIVSNEEDED(user->getNickname(), channel)));
+	this->_channels[channel]->kickUser(target, comment);
 }

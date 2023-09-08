@@ -6,7 +6,7 @@
 /*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 17:28:51 by fbily             #+#    #+#             */
-/*   Updated: 2023/09/08 17:57:03 by zhamdouc         ###   ########.fr       */
+/*   Updated: 2023/09/08 19:22:11 by zhamdouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,6 +130,21 @@ void Channel::sendMessage( User *user , std::string message)
 	{
 		if ((*it) != user)
 			(*it)->sendReply(message);
+		it++;
+	}
+}
+
+void	Channel::kickUser(std::string target, std::string comment)
+{
+	std::vector<User *>::iterator	it = this->_Users.begin();
+	while (it != this->_Users.end())
+	{
+		if ((*it)->getNickname() == target)
+		{
+			(*it)->sendReply("KICK " + this->_name + ' ' + target + ' ' + comment);
+			this->_Users.erase(it);
+			break ;
+		}
 		it++;
 	}
 }
