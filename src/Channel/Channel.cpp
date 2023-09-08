@@ -6,7 +6,7 @@
 /*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 17:28:51 by fbily             #+#    #+#             */
-/*   Updated: 2023/09/08 12:15:03 by zhamdouc         ###   ########.fr       */
+/*   Updated: 2023/09/08 12:26:00 by zhamdouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,8 +81,7 @@ bool Channel::foundUser(std::string nickname)
 		else
 			return (true);//trouve 
 	}
-	if (it == this->_Users.end())
-		return (false);//pas trouver donc probleme
+	return (false);
 }
 
 bool Channel::foundOperator(std::string nickname)
@@ -95,8 +94,7 @@ bool Channel::foundOperator(std::string nickname)
 		else
 			return (true);
 	}
-	if (it == this->_Operators.end())
-		return(false);
+	return(false);
 }
 
 bool Channel::foundInvited(std::string nickname)
@@ -109,8 +107,7 @@ bool Channel::foundInvited(std::string nickname)
 		else
 			return (true);
 	}
-	if (it == this->_Invited.end())
-		return(false);
+	return(false);
 }
 
 void Channel::addGuest(User *user)
