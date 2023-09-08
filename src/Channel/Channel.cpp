@@ -6,7 +6,7 @@
 /*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 17:28:51 by fbily             #+#    #+#             */
-/*   Updated: 2023/09/08 12:26:00 by zhamdouc         ###   ########.fr       */
+/*   Updated: 2023/09/08 17:57:03 by zhamdouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ std::string	Channel::joinChannel(std::string key, User *user)
 		if (foundInvited(user->getNickname()) == false)
 			return (ERR_INVITEONLYCHAN(user->getNickname(), this->getName()));//il est pas invite ce batard  
 	}
-	if (this->_nbUser >= this->_maxUsers)
+	if (this->_maxUsers != 0 && this->_nbUser >= this->_maxUsers)
 		return (ERR_CHANNELISFULL(user->getNickname(), this->getName()));//erreur plus de place
 	
 	if (key == this->_key)
@@ -113,4 +113,23 @@ bool Channel::foundInvited(std::string nickname)
 void Channel::addGuest(User *user)
 {
 	this->_Invited.push_back(user);
+}
+
+void Channel::sendMessage( User *user , std::string message)
+{
+	std::vector<User *>::iterator it;
+	it = this->_Operators.begin();
+	while (it != this->_Operators.end())
+	{
+		if ((*it) != user)
+			(*it)->sendReply(message);
+		it++;
+	}
+	it = this->_Users.begin();
+	while (it != this->_Users.end())
+	{
+		if ((*it) != user)
+			(*it)->sendReply(message);
+		it++;
+	}
 }

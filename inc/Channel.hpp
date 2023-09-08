@@ -6,7 +6,7 @@
 /*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 17:16:21 by fbily             #+#    #+#             */
-/*   Updated: 2023/09/08 10:50:42 by zhamdouc         ###   ########.fr       */
+/*   Updated: 2023/09/08 17:55:54 by zhamdouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,8 @@ class Channel
 		bool 			foundUser(std::string nickname);
 		bool 			foundOperator(std::string nickname);
 		void			addGuest(User *user);
+		void			sendMessage(User *user, std::string message);
+
 		//ajouter avant a la liste les invites 
 		
 };

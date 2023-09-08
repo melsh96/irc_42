@@ -6,7 +6,7 @@
 /*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 16:23:13 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/08 15:18:14 by zhamdouc         ###   ########.fr       */
+/*   Updated: 2023/09/08 17:56:00 by zhamdouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void Server::_indexingCmd()
 	_indexCmd.insert(std::pair<std::string, func>("PING", &Server::_pingCmd));
 	_indexCmd.insert(std::pair<std::string, func>("JOIN", &Server::_joinCmd));
 	_indexCmd.insert(std::pair<std::string, func>("INVITE", &Server::_inviteCmd));
-	_indexCmd.insert(std::pair<std::string, func>("PRIVMSG", &Server::_inviteCmd));
+	_indexCmd.insert(std::pair<std::string, func>("PRIVMSG", &Server::_privmsgCmd));
 }
 
 void Server::_parseCmd(User *user)
@@ -285,5 +285,41 @@ void	Server::_inviteCmd(User *user, std::string param)
 
 void	Server::_privmsgCmd(User *user, std::string param)
 {
-	
+	std::map<std::string, std::string>	channel;
+	std::string target;
+	std::string text;
+	if (param.empty())
+		return (user->sendReply(ERR_NEEDMOREPARAMS(user->getNickname(), param)));
+	target = param.substr(0, param.find(' '));
+	text = param.substr(param.find(' ') + 1);
+	if (target[0] != '#')
+	{
+		std::map<int, User *>::iterator it;
+		for(it = this->_user.begin(); it != this->_user.end(); it++)
+		{
+			if(it->second->getNickname() == target)
+				break;
+		}
+		if (it == this->_user.end())
+		{
+			std::cout << rouge << ("HERE") << fin << std::endl;
+			return(user->sendReply(ERR_NOSUCHNICK(user->getNickname(), target)));
+			
+		}
+		return (it->second->sendReply((":" + user->getNickname() + " PRIVMSG " + target + " " + text)));
+	}
+	else
+	{
+		std::map<std::string, Channel*>::iterator it;
+		for(it = this->_channels.begin(); it != this->_channels.end(); it++)
+		{
+			if(it->second->getName() == target)
+				break;
+		}
+		if (it == this->_channels.end())
+			return(user->sendReply(ERR_NOSUCHCHANNEL(user->getNickname(), target)));
+		it->second->sendMessage(user, (":" + user->getNickname() + " PRIVMSG " + target + " " + text));
+		return ;
+	}
+	std::cout << rouge << (":" + user->getNickname() + " PRIVMSG " + target + " " + text) << fin << std::endl;
 }
