@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerCmds.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
+/*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 16:23:13 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/08 20:26:45 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/09 17:20:06 by zhamdouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,8 @@ void Server::_indexingCmd()
 	_indexCmd.insert(std::pair<std::string, func>("INVITE", &Server::_inviteCmd));
 	_indexCmd.insert(std::pair<std::string, func>("PRIVMSG", &Server::_privmsgCmd));
 	_indexCmd.insert(std::pair<std::string, func>("KICK", &Server::_kickCmd));
+	_indexCmd.insert(std::pair<std::string, func>("MODE", &Server::_modeCmd));
+	_indexCmd.insert(std::pair<std::string, func>("TOPIC", &Server::_topicCmd));
 }
 
 void Server::_parseCmd(User *user)
@@ -353,4 +355,35 @@ void	Server::_kickCmd(User *user, std::string param)
 	if (this->_channels[channel]->foundOperator(user->getNickname()) == false)
 		return (user->sendReply(ERR_CHANOPRIVSNEEDED(user->getNickname(), channel)));
 	this->_channels[channel]->kickUser(user, target, comment);
+}
+
+void	Server::_modeCmd(User *user, std::string param)
+{
+	//checker si le canal existe
+	//checker que celui qui execute est bien un operator
+	//checker qu'on ait mis + ou - puis quelle mode on change et ne rien faire si il y a rien a faire
+	//checker qu'est ait mis le bon argument, par exemple si on enleve 
+	std::string channel;
+	std::string modestring;
+	std::string argument;
+
+	channel = param.substr(0, param.find(' '));
+	modestring = param.substr(param.find(' ') + 1);
+	argument = modestring.substr(modestring.find(' ') + 1);
+	modestring.erase(modestring.find(' '), argument.length() + 1);
+	
+	if (channel[0] == '#')
+	{
+		if (modestring.empty() && argument.empty())
+			return ;//envoyer quelles sont les modes actif -> RPL_CHANNELMODEIS
+
+	}
+	else
+		return ;// erreur car il doit s'agir d'un user et on ne fait pas -> ERR_NOSUCHCHANNEL 
+}
+
+
+void	Server::_topicCmd(User *user, std::string param)
+{
+	
 }
