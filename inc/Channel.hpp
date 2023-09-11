@@ -6,7 +6,7 @@
 /*   By: zheylkoss <zheylkoss@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 17:16:21 by fbily             #+#    #+#             */
-/*   Updated: 2023/09/11 01:06:45 by zheylkoss        ###   ########.fr       */
+/*   Updated: 2023/09/11 03:54:29 by zheylkoss        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,8 @@ class Channel
 
 		std::string		getName() const;
 		std::string 	getTopic() const;
+		bool			getModeTopic() const;
+		unsigned int	get_maxUsers(void);
 		
 		std::string		joinChannel(std::string key, User *user);
 		bool 			foundInvited(std::string nickname);
@@ -62,7 +64,7 @@ class Channel
 		User			*returnUser(std::string nickname);
 		void			kickModeUser(std::string target);
 		void			set_maxUsers(std::string argument, int pos_argument, std::string modestring);
-		unsigned int	get_maxUsers(void);
+		void			setTopic(std::string newTopic);
 		//ajouter avant a la liste les invites 
 		
 };

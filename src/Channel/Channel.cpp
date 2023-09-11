@@ -6,7 +6,7 @@
 /*   By: zheylkoss <zheylkoss@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 17:28:51 by fbily             #+#    #+#             */
-/*   Updated: 2023/09/11 02:21:08 by zheylkoss        ###   ########.fr       */
+/*   Updated: 2023/09/11 04:02:01 by zheylkoss        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,21 @@ std::string	Channel::getName() const
 std::string Channel::getTopic() const
 {
 	return (this->_topic);
+}
+
+bool Channel::getModeTopic() const
+{
+	return (this->_topicMode);
+}
+
+void Channel::setTopic(std::string newTopic)
+{
+	std::cout << "ANCIEN : " << this->_topic << std::endl;
+	if(newTopic == ":")//a confirmer car si on ne recoit rien donc ":" alors on doit effacer le topic
+		this->_topic = "";
+	else
+		this->_topic = newTopic;
+	std::cout << "NOUVEAU : " << this->_topic << std::endl;
 }
 
 std::string	Channel::joinChannel(std::string key, User *user)

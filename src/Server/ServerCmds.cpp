@@ -6,7 +6,7 @@
 /*   By: zheylkoss <zheylkoss@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 16:23:13 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/11 01:31:30 by zheylkoss        ###   ########.fr       */
+/*   Updated: 2023/09/11 04:12:37 by zheylkoss        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void Server::_indexingCmd()
 	_indexCmd.insert(std::pair<std::string, func>("PRIVMSG", &Server::_privmsgCmd));
 	_indexCmd.insert(std::pair<std::string, func>("KICK", &Server::_kickCmd));
 	_indexCmd.insert(std::pair<std::string, func>("MODE", &Server::_modeCmd));
-	// _indexCmd.insert(std::pair<std::string, func>("TOPIC", &Server::_topicCmd));
+	_indexCmd.insert(std::pair<std::string, func>("TOPIC", &Server::_topicCmd));
 }
 
 void Server::_parseCmd(User *user)
@@ -359,10 +359,6 @@ void	Server::_kickCmd(User *user, std::string param)
 
 void	Server::_modeCmd(User *user, std::string param)
 {
-	//checker si le canal existe
-	//checker que celui qui execute est bien un operator
-	//checker qu'on ait mis + ou - puis quelle mode on change et ne rien faire si il y a rien a faire
-	//checker qu'est ait mis le bon argument, par exemple si on enleve
 	/* MODE - Changer le mode du channel :
 		— i : Définir/supprimer le canal sur invitation uniquement (pas besoin d'argument)
 		— t : Définir/supprimer les restrictions de la commande TOPIC pour les opérateurs de canaux (pas besoin d'argument)
@@ -373,7 +369,6 @@ void	Server::_modeCmd(User *user, std::string param)
 	std::string modestring;
 	std::string argument;
 
-	std::cout << "Je suiis dedans " << std::endl;
 	channel = param.substr(0, param.find(' '));
 	modestring = param.substr(param.find(' ') + 1);
 	if (modestring.find(' ') != std::string::npos)
@@ -381,7 +376,6 @@ void	Server::_modeCmd(User *user, std::string param)
 		argument = modestring.substr(modestring.find(' ') + 1);
 		modestring.erase(modestring.find(' '), argument.length() + 1);
 	}
-	std::cout << "ca a crash " << std::endl;
 
 	if (channel[0] == '#')
 	{
@@ -398,33 +392,53 @@ void	Server::_modeCmd(User *user, std::string param)
 		
 	}
 	else
-		return (user->sendReply((user->getNickname(), channel)));// erreur car il doit s'agir d'un user et on ne fait pas -> ERR_NOSUCHCHANNEL 
+		return (user->sendReply(ERR_NOSUCHCHANNEL(user->getNickname(), channel)));// erreur car il doit s'agir d'un user et on ne fait pas -> ERR_NOSUCHCHANNEL 
 }
 
 
-// void	Server::_topicCmd(User *user, std::string param)
-// {
-// 	std::string channel;
-// 	std::string topic;
+void	Server::_topicCmd(User *user, std::string param)//verifier la gestion du ":"
+{
+	std::string channel;
+	std::string topic;
+	size_t pos = 0;
 
-// 	channel = param.substr(0, param.find(' '));
-// 	topic = param.substr(param.find(' ') + 1);
+	pos = param.find(' ');
+	channel = param.substr(0, param.find(' '));
+	if(pos != std::string::npos)
+		topic = param.substr(param.find(' ') + 1);
 
-// 	//verifier que le channel existe
+	if (this->_channels.find(channel) == this->_channels.end())
+			return (user->sendReply(ERR_NOSUCHCHANNEL(user->getNickname(), channel)));//verifier si c'est le bon message
+	if (this->_channels[channel]->foundUser(user->getNickname()) == false && this->_channels[channel]->foundOperator(user->getNickname()) == false)
+		return (user->sendReply(ERR_NOTONCHANNEL(user->getNickname(), channel)));//ERR_NOTONCHANNEL
+	if (topic.empty())
+	{
+		topic = this->_channels[channel]->getTopic();
+		if (topic.empty())
+			return (user->sendReply(RPL_NOTOPIC(user->getNickname(), user->getServer(), channel)));//=> RPL_NOTOPIC, If RPL_TOPIC is returned to the client sending this command, RPL_TOPICWHOTIME SHOULD also be sent to that client.
+		else
+			return(user->sendReply(RPL_TOPIC(user->getNickname(), user->getServer(), channel, this->_channels[channel]->getTopic()))) ; //il y a un topic dans le channel le return le nom du topic => RPL_TOPIC 
+	}
+	if(this->_channels[channel]->getModeTopic())//vrai -> il faut etre operator
+	{
+		if (!this->_channels[channel]->foundOperator(user->getNickname()) == true)
+			return (user->sendReply(ERR_CHANOPRIVSNEEDED(user->getNickname(),channel)));
+		this->_channels[channel]->setTopic(topic);
+		return(user->sendReply(RPL_TOPIC(user->getNickname(), user->getServer(), channel, this->_channels[channel]->getTopic())));
+		//=> RPL_NOTOPIC, If RPL_TOPIC is returned to the client sending this command, RPL_TOPICWHOTIME SHOULD also be sent to that client.
+	}
+	else
+	{
+		this->_channels[channel]->setTopic(topic);
+		return(user->sendReply(RPL_TOPIC(user->getNickname(), user->getServer(), channel, this->_channels[channel]->getTopic())));
+		//=> RPL_NOTOPIC, If RPL_TOPIC is returned to the client sending this command, RPL_TOPICWHOTIME SHOULD also be sent to that client.
+	}
+		
+
 	
-// 	if (/* si le user appartient pas au channel  */)
-// 		return ;//ERR_NOTONCHANNEL
-// 	if (topic.empty())
-// 	{
-// 		//si il y a un topic dans le channel le return le nom du topic => RPL_TOPIC 
-// 		//sinon return => RPL_NOTOPIC
-// 	}
+	//pas compris le commentaire d'apres
+	//If RPL_TOPIC is returned to the client sending this command, RPL_TOPICWHOTIME SHOULD also be sent to that client.
 
-// 	//verifier sur le channel, si seul les operateur ou non ont le droit de modifier le topic
-// 	//si c'est un user et que seul les operateurs peuvent le modifier alors => ERR_CHANOPRIVSNEEDED 
-	
-// 	//pas compris le commentaire d'apres
-// 	//If RPL_TOPIC is returned to the client sending this command, RPL_TOPICWHOTIME SHOULD also be sent to that client.
-
-// 	//si le topic est modifie toutes les personnes du channel recoivent un message avec la modification 	
-// }
+	//si le topic est modifie toutes les personnes du channel recoivent un message avec la modification 
+	/* If the topic of a channel is changed or cleared, every client in that channel (including the author of the topic change) will receive a TOPIC command with the new topic as argument (or an empty argument if the topic was cleared) alerting them to how the topic has changed. */	
+}

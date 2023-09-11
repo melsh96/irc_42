@@ -6,7 +6,7 @@
 /*   By: zheylkoss <zheylkoss@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/03 14:10:07 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/11 00:12:05 by zheylkoss        ###   ########.fr       */
+/*   Updated: 2023/09/11 03:36:27 by zheylkoss        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ class Server {
 		void							_privmsgCmd(User *user, std::string param);
 		void							_kickCmd(User *user, std::string param);
 		void							_modeCmd(User *user, std::string param);
-		// void							_topicCmd(User *user, std::string param);
+		void							_topicCmd(User *user, std::string param);
 
 		void							_clean();
 
