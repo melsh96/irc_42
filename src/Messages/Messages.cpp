@@ -6,7 +6,7 @@
 /*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 10:57:59 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/08 15:28:17 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/11 19:32:17 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,11 @@ std::string RPL_TOPIC(std::string nick, std::string server, std::string channel,
 //"<client> <channel> :No topic is set"
 std::string RPL_NOTOPIC(std::string nick, std::string server, std::string channel){
 	return (":" + server + " 331 " + nick + ' ' + channel + ":No topic is set");
+}
+
+//"<client> <channel> <nick> <setat>"
+std::string RPL_TOPICWHOTIME(std::string nick, std::string server, std::string channel, std::string user, std::string date){
+	return (":" + server + " 333 " + nick + ' ' + channel + ' ' + user + ' ' + date);
 }
 
 //"<client> <symbol> <channel> :[prefix]<nick>{ [prefix]<nick>}"
@@ -133,11 +138,10 @@ std::string ERR_USERONCHANNEL(std::string nick, std::string channel, std::string
 	return ("443 " + nick + ' ' + user + ' ' + channel + ":is already on channel");
 }
 
-//"<client> :Unknown MODE flag"
-std::string ERR_UMODEUNKNOWNFLAG(std::string nick){
-	return ("501 " + nick + "Unknown MODE flag");
+//"<client> <modechar> :is unknown mode char to me"
+std::string ERR_UNKNOWNMODE(std::string nick, std::string modechar){
+	return ("472 " + nick + ' ' + modechar);
 }
-
 //"<client> <nickname> :No such nick/channel"
 std::string ERR_NOSUCHNICK(std::string nick, std::string user)
 {

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerCmds.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zheylkoss <zheylkoss@student.42.fr>        +#+  +:+       +#+        */
+/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 16:23:13 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/11 04:12:37 by zheylkoss        ###   ########.fr       */
+/*   Updated: 2023/09/11 18:50:23 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -382,21 +382,19 @@ void	Server::_modeCmd(User *user, std::string param)
 		if (this->_channels.find(channel) == this->_channels.end())
 			return (user->sendReply(ERR_NOSUCHCHANNEL(user->getNickname(), channel)));//verifier si c'est le bon message
 		if(this->_channels[channel]->foundUser(user->getNickname()) == false && this->_channels[channel]->foundOperator(user->getNickname()) == false)
-			return; //message d'erreur il n'est pas dans le channel 
+			return (user->sendReply(ERR_NOTONCHANNEL(user->getNickname(), channel)));//message d'erreur il n'est pas dans le channel 
 		if (modestring.empty() && argument.empty())
-			return ;//envoyer quelles sont les modes actif -> RPL_CHANNELMODEIS
+			return ;//envoyer quelles sont les modes actif -> RPL_CHANNELMODEIS + RPL_CREATIONTIME
 		size_t pos = modestring.find_first_not_of("+-itkol");
 		if (pos != std::string::npos)
-			return ;// on m'envoie un mauvais modestring
+			return (user->sendReply(ERR_UNKNOWNMODE(user->getNickname(), modestring.substr(pos, 1))));// on m'envoie un mauvais modestring
 		this->_channels[channel]->modeChannel(user, modestring, argument, channel);
-		
 	}
 	else
-		return (user->sendReply(ERR_NOSUCHCHANNEL(user->getNickname(), channel)));// erreur car il doit s'agir d'un user et on ne fait pas -> ERR_NOSUCHCHANNEL 
+		return (user->sendReply(ERR_NOSUCHCHANNEL(user->getNickname(), channel)));// On garde ou pas ? Comment on fait pour gerer le Mode +i suite a la connection d'user ?
 }
 
-
-void	Server::_topicCmd(User *user, std::string param)//verifier la gestion du ":"
+void	Server::_topicCmd(User *user, std::string param)
 {
 	std::string channel;
 	std::string topic;
@@ -405,8 +403,7 @@ void	Server::_topicCmd(User *user, std::string param)//verifier la gestion du ":
 	pos = param.find(' ');
 	channel = param.substr(0, param.find(' '));
 	if(pos != std::string::npos)
-		topic = param.substr(param.find(' ') + 1);
-
+		topic = param.substr(param.find(' ') + 2); // + 2 pour retirer le ':'
 	if (this->_channels.find(channel) == this->_channels.end())
 			return (user->sendReply(ERR_NOSUCHCHANNEL(user->getNickname(), channel)));//verifier si c'est le bon message
 	if (this->_channels[channel]->foundUser(user->getNickname()) == false && this->_channels[channel]->foundOperator(user->getNickname()) == false)
@@ -415,30 +412,26 @@ void	Server::_topicCmd(User *user, std::string param)//verifier la gestion du ":
 	{
 		topic = this->_channels[channel]->getTopic();
 		if (topic.empty())
-			return (user->sendReply(RPL_NOTOPIC(user->getNickname(), user->getServer(), channel)));//=> RPL_NOTOPIC, If RPL_TOPIC is returned to the client sending this command, RPL_TOPICWHOTIME SHOULD also be sent to that client.
+			return (user->sendReply(RPL_NOTOPIC(user->getNickname(), user->getServer(), channel)));	//=> RPL_NOTOPIC
 		else
-			return(user->sendReply(RPL_TOPIC(user->getNickname(), user->getServer(), channel, this->_channels[channel]->getTopic()))) ; //il y a un topic dans le channel le return le nom du topic => RPL_TOPIC 
+		{
+			//il y a un topic dans le channel le return le nom du topic => RPL_TOPIC 
+			user->sendReply(RPL_TOPIC(user->getNickname(), user->getServer(), channel, this->_channels[channel]->getTopic()));
+			return (user->sendReply(RPL_TOPICWHOTIME(user->getNickname(), user->getServer(), channel, this->_channels[channel]->getTopicUser(), this->_channels[channel]->getTopicDate())));
+		}
 	}
 	if(this->_channels[channel]->getModeTopic())//vrai -> il faut etre operator
 	{
 		if (!this->_channels[channel]->foundOperator(user->getNickname()) == true)
 			return (user->sendReply(ERR_CHANOPRIVSNEEDED(user->getNickname(),channel)));
-		this->_channels[channel]->setTopic(topic);
-		return(user->sendReply(RPL_TOPIC(user->getNickname(), user->getServer(), channel, this->_channels[channel]->getTopic())));
-		//=> RPL_NOTOPIC, If RPL_TOPIC is returned to the client sending this command, RPL_TOPICWHOTIME SHOULD also be sent to that client.
+		this->_channels[channel]->setTopic(user, topic);
+		user->sendReply(RPL_TOPIC(user->getNickname(), user->getServer(), channel, this->_channels[channel]->getTopic()));
+		return (user->sendReply(RPL_TOPICWHOTIME(user->getNickname(), user->getServer(), channel, this->_channels[channel]->getTopicUser(), this->_channels[channel]->getTopicDate())));
 	}
 	else
 	{
-		this->_channels[channel]->setTopic(topic);
-		return(user->sendReply(RPL_TOPIC(user->getNickname(), user->getServer(), channel, this->_channels[channel]->getTopic())));
-		//=> RPL_NOTOPIC, If RPL_TOPIC is returned to the client sending this command, RPL_TOPICWHOTIME SHOULD also be sent to that client.
+		this->_channels[channel]->setTopic(user, topic);
+		user->sendReply(RPL_TOPIC(user->getNickname(), user->getServer(), channel, this->_channels[channel]->getTopic()));
+		return (user->sendReply(RPL_TOPICWHOTIME(user->getNickname(), user->getServer(), channel, this->_channels[channel]->getTopicUser(), this->_channels[channel]->getTopicDate())));
 	}
-		
-
-	
-	//pas compris le commentaire d'apres
-	//If RPL_TOPIC is returned to the client sending this command, RPL_TOPICWHOTIME SHOULD also be sent to that client.
-
-	//si le topic est modifie toutes les personnes du channel recoivent un message avec la modification 
-	/* If the topic of a channel is changed or cleared, every client in that channel (including the author of the topic change) will receive a TOPIC command with the new topic as argument (or an empty argument if the topic was cleared) alerting them to how the topic has changed. */	
 }

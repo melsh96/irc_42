@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zheylkoss <zheylkoss@student.42.fr>        +#+  +:+       +#+        */
+/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 17:28:51 by fbily             #+#    #+#             */
-/*   Updated: 2023/09/11 04:02:01 by zheylkoss        ###   ########.fr       */
+/*   Updated: 2023/09/11 19:37:00 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,14 +56,29 @@ bool Channel::getModeTopic() const
 	return (this->_topicMode);
 }
 
-void Channel::setTopic(std::string newTopic)
+std::string	Channel::getTopicDate() const
 {
-	std::cout << "ANCIEN : " << this->_topic << std::endl;
-	if(newTopic == ":")//a confirmer car si on ne recoit rien donc ":" alors on doit effacer le topic
+	return (this->_topicTime);
+}
+
+std::string	Channel::getTopicUser() const
+{
+	return (this->_topicUser);
+}
+
+void Channel::setTopic(User *user, std::string newTopic)
+{
+	time_t	now = time(0);
+	std::ostringstream oss;
+	oss << now;
+	if(newTopic == ":")
 		this->_topic = "";
 	else
 		this->_topic = newTopic;
-	std::cout << "NOUVEAU : " << this->_topic << std::endl;
+	this->_topicTime = oss.str(); // retiens l'heure de modif
+	this->_topicUser = user->getNickname(); // retien qui l'a modif
+	sendMessage(user, RPL_TOPIC(user->getNickname(), user->getServer(), this->_name, this->_topic));
+	sendMessage(user, RPL_TOPICWHOTIME(user->getNickname(), user->getServer(), this->_name, this->_topicUser, this->_topicTime));
 }
 
 std::string	Channel::joinChannel(std::string key, User *user)
@@ -94,7 +109,7 @@ bool Channel::foundUser(std::string nickname)
 		if (nickname != (*it)->getNickname())
 			it++;
 		else
-			return (true);//trouve 
+			return (true);//trouve
 	}
 	return (false);
 }
@@ -131,7 +146,7 @@ void Channel::addGuest(User *user)
 	this->_Invited.push_back(user);
 }
 
-void Channel::sendMessage( User *user , std::string message)
+void Channel::sendMessage(User *user , std::string message)
 {
 	std::vector<User *>::iterator it;
 	it = this->_Operators.begin();
@@ -246,7 +261,6 @@ void	Channel::set_key(std::string argument, int pos_argument, std::string modest
 	if (!argument.empty())
 		this->_key = arg_1;
 	//quoi faire si on a fait +k mais sans argument
-
 }
 
 void	Channel::kickModeOperator(std::string target)
@@ -372,7 +386,7 @@ void	Channel::set_op(User *user, std::string argument, int pos_argument, std::st
 //     return true;
 // }
 
-unsigned int	Channel::get_maxUsers(void)
+unsigned int	Channel::getMaxUsers() const
 {
 	return (this->_maxUsers);
 }
@@ -409,7 +423,6 @@ void	Channel::set_maxUsers(std::string argument, int pos_argument, std::string m
 	if (!argument.empty())
 		this->_maxUsers = std::atoi(arg_1.c_str());
 	//que faire si on ne recoit pas d'argument 
-	
 }
 
 void	Channel::modeChannel(User *user, std::string modestring, std::string argument, std::string channel)
@@ -426,8 +439,8 @@ void	Channel::modeChannel(User *user, std::string modestring, std::string argume
 	ce qui fait donc au max 3 argument  */
 	int pos_argument = 0;
 	
-	if (hasDuplicates(modestring))
-		return ;//erreur doublon
+	//if (hasDuplicates(modestring))
+	//	return ;//erreur doublon
 	if (this->foundOperator(user->getNickname()) == false)
 		return (user->sendReply((user->getNickname(), channel)));//seul un operator peut changer les modes, je le fais que mtn car il me semble qu'un User peut lancer la commande Mode sans rien
 	if(modestring[0] == '+' || modestring[0] == '-')//pour l'instant j'aurtorise que l'un des deux mais je peux sinon mettre en place la possibilite de swap entre les deux mais faudra changer la fonction qui check les duplicates
@@ -461,8 +474,7 @@ void	Channel::modeChannel(User *user, std::string modestring, std::string argume
 				set_maxUsers(argument, pos_argument, modestring);
 				pos_argument++;
 			}
-		}
-			
+		}		
 	}
 	else
 		return ; //erreur car il ne commence pas par + ou -

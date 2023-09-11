@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   User.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/03 18:45:15 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/08 11:22:18 by zhamdouc         ###   ########.fr       */
+/*   Updated: 2023/09/11 18:55:38 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,7 @@ void	User::welcome(void)
 {
 	sendReply(RPL_WELCOME(_nickname, _server, _username, _hostname));
 	sendReply(RPL_YOURHOST(_nickname, _server));
-	sendReply(RPL_CREATED(_nickname, _server, timestamp()));
+	sendReply(RPL_CREATED(_nickname, _server, timestamp())); // Remplacer timestamp par une variable qui stock la date de creation du serv ??
 	sendReply(RPL_MYINFO(_nickname, _server));
 	_welcomed = true;
 }
