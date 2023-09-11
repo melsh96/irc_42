@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerCmds.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: zheylkoss <zheylkoss@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 16:23:13 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/09 17:20:06 by zhamdouc         ###   ########.fr       */
+/*   Updated: 2023/09/11 01:31:30 by zheylkoss        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void Server::_indexingCmd()
 	_indexCmd.insert(std::pair<std::string, func>("PRIVMSG", &Server::_privmsgCmd));
 	_indexCmd.insert(std::pair<std::string, func>("KICK", &Server::_kickCmd));
 	_indexCmd.insert(std::pair<std::string, func>("MODE", &Server::_modeCmd));
-	_indexCmd.insert(std::pair<std::string, func>("TOPIC", &Server::_topicCmd));
+	// _indexCmd.insert(std::pair<std::string, func>("TOPIC", &Server::_topicCmd));
 }
 
 void Server::_parseCmd(User *user)
@@ -313,7 +313,7 @@ void	Server::_privmsgCmd(User *user, std::string param)
 		}
 		if (it == this->_user.end())
 		{
-			std::cout << rouge << ("HERE") << fin << std::endl;
+			// std::cout << rouge << ("HERE") << fin << std::endl;
 			return(user->sendReply(ERR_NOSUCHNICK(user->getNickname(), target)));
 			
 		}
@@ -362,28 +362,69 @@ void	Server::_modeCmd(User *user, std::string param)
 	//checker si le canal existe
 	//checker que celui qui execute est bien un operator
 	//checker qu'on ait mis + ou - puis quelle mode on change et ne rien faire si il y a rien a faire
-	//checker qu'est ait mis le bon argument, par exemple si on enleve 
+	//checker qu'est ait mis le bon argument, par exemple si on enleve
+	/* MODE - Changer le mode du channel :
+		— i : Définir/supprimer le canal sur invitation uniquement (pas besoin d'argument)
+		— t : Définir/supprimer les restrictions de la commande TOPIC pour les opérateurs de canaux (pas besoin d'argument)
+		— k : Définir/supprimer la clé du canal (mot de passe) (pas besoin d'argument)
+		()— o : Donner/retirer le privilège de l’opérateur de canal (besoin d'un argument)
+		()— l : Définir/supprimer la limite d’utilisateurs pour le canal ()*/
 	std::string channel;
 	std::string modestring;
 	std::string argument;
 
+	std::cout << "Je suiis dedans " << std::endl;
 	channel = param.substr(0, param.find(' '));
 	modestring = param.substr(param.find(' ') + 1);
-	argument = modestring.substr(modestring.find(' ') + 1);
-	modestring.erase(modestring.find(' '), argument.length() + 1);
-	
+	if (modestring.find(' ') != std::string::npos)
+	{
+		argument = modestring.substr(modestring.find(' ') + 1);
+		modestring.erase(modestring.find(' '), argument.length() + 1);
+	}
+	std::cout << "ca a crash " << std::endl;
+
 	if (channel[0] == '#')
 	{
+		if (this->_channels.find(channel) == this->_channels.end())
+			return (user->sendReply(ERR_NOSUCHCHANNEL(user->getNickname(), channel)));//verifier si c'est le bon message
+		if(this->_channels[channel]->foundUser(user->getNickname()) == false && this->_channels[channel]->foundOperator(user->getNickname()) == false)
+			return; //message d'erreur il n'est pas dans le channel 
 		if (modestring.empty() && argument.empty())
 			return ;//envoyer quelles sont les modes actif -> RPL_CHANNELMODEIS
-
+		size_t pos = modestring.find_first_not_of("+-itkol");
+		if (pos != std::string::npos)
+			return ;// on m'envoie un mauvais modestring
+		this->_channels[channel]->modeChannel(user, modestring, argument, channel);
+		
 	}
 	else
-		return ;// erreur car il doit s'agir d'un user et on ne fait pas -> ERR_NOSUCHCHANNEL 
+		return (user->sendReply((user->getNickname(), channel)));// erreur car il doit s'agir d'un user et on ne fait pas -> ERR_NOSUCHCHANNEL 
 }
 
 
-void	Server::_topicCmd(User *user, std::string param)
-{
+// void	Server::_topicCmd(User *user, std::string param)
+// {
+// 	std::string channel;
+// 	std::string topic;
+
+// 	channel = param.substr(0, param.find(' '));
+// 	topic = param.substr(param.find(' ') + 1);
+
+// 	//verifier que le channel existe
 	
-}
+// 	if (/* si le user appartient pas au channel  */)
+// 		return ;//ERR_NOTONCHANNEL
+// 	if (topic.empty())
+// 	{
+// 		//si il y a un topic dans le channel le return le nom du topic => RPL_TOPIC 
+// 		//sinon return => RPL_NOTOPIC
+// 	}
+
+// 	//verifier sur le channel, si seul les operateur ou non ont le droit de modifier le topic
+// 	//si c'est un user et que seul les operateurs peuvent le modifier alors => ERR_CHANOPRIVSNEEDED 
+	
+// 	//pas compris le commentaire d'apres
+// 	//If RPL_TOPIC is returned to the client sending this command, RPL_TOPICWHOTIME SHOULD also be sent to that client.
+
+// 	//si le topic est modifie toutes les personnes du channel recoivent un message avec la modification 	
+// }

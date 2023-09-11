@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: zheylkoss <zheylkoss@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/03 14:10:07 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/09 16:14:23 by zhamdouc         ###   ########.fr       */
+/*   Updated: 2023/09/11 00:12:05 by zheylkoss        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,9 @@
 #include <cstdlib>
 #include <map>
 #include <signal.h>
+#include <climits>
+#include <string>
+
 
 #include "Color.hpp"
 #include "User.hpp"
@@ -72,7 +75,7 @@ class Server {
 		void							_privmsgCmd(User *user, std::string param);
 		void							_kickCmd(User *user, std::string param);
 		void							_modeCmd(User *user, std::string param);
-		void							_topicCmd(User *user, std::string param);
+		// void							_topicCmd(User *user, std::string param);
 
 		void							_clean();
 

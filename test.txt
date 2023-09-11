@@ -5,3 +5,5 @@ pas le droit au espace et au virgule
 	/join "4 2"
 Quand on utilise "#" pour le nom d'un channel cela veut dire que le channel est universel (pas lie a un server)
 Quand on utilise "&" pour le nom d'un channel cela veut dire qu'il est lie a un seul server.
+
+que se passe t il si on essaye de rejoindre un channel qui n'a pas de key en tapant un key en le rejoignant 

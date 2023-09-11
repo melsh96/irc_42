@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
+/*   By: zheylkoss <zheylkoss@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 17:28:51 by fbily             #+#    #+#             */
-/*   Updated: 2023/09/08 20:17:28 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/11 02:21:08 by zheylkoss        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,7 @@ bool Channel::foundUser(std::string nickname)
 	}
 	return (false);
 }
+
 
 bool Channel::foundOperator(std::string nickname)
 {
@@ -168,4 +169,286 @@ void	Channel::listUsersOnChannel(User *user)
 	}
 	user->sendReply(result);
 	user->sendReply(":" + user->getServer() + " 366 " + user->getNickname() + ' ' + this->getName() + " :End of /NAMES list");
+}
+
+bool Channel::hasDuplicates(const std::string& str) 
+{
+	if(str.size() > 6 )
+		return (false);
+    for (std::size_t i = 0; i < str.size(); i++) 
+	{
+        for (std::size_t j = i + 1; j < str.size(); j++) 
+		{
+            if (str[i] == str[j])
+                return true;
+        }
+    }
+    return false;
+}
+
+void	Channel::set_inviteMode(std::string modestring)
+{
+	if (modestring[0] == '+')
+		this->_inviteMode = true;
+	if (modestring[0] == '-')
+		this->_inviteMode = false;
+}
+
+void	Channel::set_topicMode(std::string modestring)
+{
+	if (modestring[0] == '+')
+		this->_topicMode = true;
+	if (modestring[0] == '-')
+		this->_topicMode = false;
+}
+
+void	Channel::set_key(std::string argument, int pos_argument, std::string modestring)
+{
+	if (modestring[0] == '-')
+	{
+		this->_key = "";//supprimer le mot de passe ou mettre '\0'
+		return ;
+	}
+	std::string arg_1;
+	int pos_bis = 0;
+	size_t pos;
+	
+	while (!argument.empty() && pos_bis <= pos_argument)
+	{
+		pos = argument.find(' ');
+		arg_1 = argument.substr(0, argument.find(' '));
+		if (pos_bis == pos_argument)
+			break;
+		if (pos == std::string::npos)
+		{
+			argument.erase(0, arg_1.length());  
+			break;
+		}
+		else
+			argument.erase(0, arg_1.length() + 1);// +1 pour supprimer l'espace suivant
+		pos_bis++;
+	}
+	if (!argument.empty())
+		this->_key = arg_1;
+	//quoi faire si on a fait +k mais sans argument
+
+}
+
+void	Channel::kickModeOperator(std::string target)
+{
+	std::vector<User *>::iterator	it = this->_Operators.begin();
+	while (it != this->_Operators.end())
+	{
+		if ((*it)->getNickname() == target)
+		{
+			this->_Operators.erase(it);
+			break ;
+		}
+		it++;
+	}
+}
+
+void	Channel::kickModeUser(std::string target)
+{
+	std::vector<User *>::iterator	it = this->_Users.begin();
+	while (it != this->_Users.end())
+	{
+		if ((*it)->getNickname() == target)
+		{
+			this->_Users.erase(it);
+			break ;
+		}
+		it++;
+	}
+}
+
+User* Channel::returnOperator(std::string nickname)
+{
+	std::vector<User *>::iterator it = this->_Operators.begin();
+	while (it != this->_Operators.end())
+	{
+		if (nickname != (*it)->getNickname())
+			it++;
+		else
+			return (*it);
+	}
+	return (*it);
+}
+
+User* Channel::returnUser(std::string nickname)
+{
+	std::vector<User *>::iterator it = this->_Users.begin();
+	while (it != this->_Users.end())
+	{
+		if (nickname != (*it)->getNickname())
+			it++;
+		else
+			return (*it);
+	}
+	return (*it);
+}
+
+void	Channel::set_op(User *user, std::string argument, int pos_argument, std::string modestring)
+{
+	std::string arg_1;
+	int pos_bis = 0;
+	size_t pos = 0;
+
+	while (!argument.empty() && pos_bis <= pos_argument)
+	{
+		pos = argument.find(' ');
+		arg_1 = argument.substr(0, argument.find(' '));
+		if (pos_bis == pos_argument)
+			break;
+		if (pos == std::string::npos)
+		{
+			argument.erase(0, arg_1.length());  
+			break;
+		}
+		else
+			argument.erase(0, arg_1.length() + 1);// +1 pour supprimer l'espace suivant
+		pos_bis++;
+	}
+
+	if (foundOperator(user->getNickname()))
+	{
+		if (!argument.empty() && foundOperator(arg_1))
+		{
+			if (modestring[0] == '-')
+			{
+				this->_Users.push_back(returnOperator(arg_1));
+				kickModeOperator(arg_1);
+				//pour tester si c'est bon je peux faire un if qui found operator et un autre qui found USer et print dans les 2 pour voir 
+			}
+			if (modestring[0] == '+')
+			{
+				this->_Operators.push_back(returnOperator(arg_1));
+				kickModeUser(arg_1);
+				//pour tester si c'est bon je peux faire un if qui found operator et un autre qui found USer et print dans les 2 pour voir
+			}
+		}
+		else
+			return ;//on ne peut pas retirer le privilege a un User
+		
+	}
+	else
+		return ; //Un user ne peut pas retirer de privilege
+}
+
+// bool safeStringToInt(const std::string& str, int& result)
+// {
+//     std::stringstream ss(str);
+//     long temp; // Utiliser un type plus grand pour capturer les valeurs en dehors des limites de int
+
+//     ss >> temp; // Effectuer la conversion
+
+//     // Vérifier l'état du stringstream
+//     if (ss.fail() || !ss.eof()) {
+//         return false;
+//     }
+
+//     // Vérifier les limites pour le type int
+//     if (temp > INT_MAX || temp < INT_MIN) {
+//         return false;
+//     }
+
+//     // Tout est ok, affecter la valeur à result
+//     result = static_cast<unsigned int>(temp);
+//     return true;
+// }
+
+unsigned int	Channel::get_maxUsers(void)
+{
+	return (this->_maxUsers);
+}
+
+void	Channel::set_maxUsers(std::string argument, int pos_argument, std::string modestring)
+{
+	//attention a ce que le nouveau max user ne puisse pas etre inferieur au nombre actuel de user + operator
+	if (modestring[0] == '-')
+	{
+		this->_maxUsers = 0;//supprimer la limit
+		return ;
+	}
+	//checker quelle est le max pour un channel
+	std::string arg_1;//faire le parsing du int 
+	size_t pos = 0;
+	int pos_bis = 0;
+	
+	while (!argument.empty() && pos_bis <= pos_argument)
+	{
+		pos = argument.find(' ');
+		arg_1 = argument.substr(0, argument.find(' '));
+		if (pos_bis == pos_argument)
+			break;
+		if (pos == std::string::npos)
+		{
+			argument.erase(0, arg_1.length());  
+			break;
+		}
+		else
+			argument.erase(0, arg_1.length() + 1);// +1 pour supprimer l'espace suivant
+		pos_bis++;
+	}
+	
+	if (!argument.empty())
+		this->_maxUsers = std::atoi(arg_1.c_str());
+	//que faire si on ne recoit pas d'argument 
+	
+}
+
+void	Channel::modeChannel(User *user, std::string modestring, std::string argument, std::string channel)
+{
+	/* est ce que on doit envoyer un message si on essaye de mettre a vrai une valeur deja vrai
+	quelle erreur envoyer en cas de muavais modestring */
+	/* MODE - Changer le mode du channel :
+		— i : Définir/supprimer le canal sur invitation uniquement (pas besoin d'argument)
+		— t : Définir/supprimer les restrictions de la commande TOPIC pour les opérateurs de canaux (pas besoin d'argument)
+		()— k : Définir/supprimer la clé du canal (mot de passe) (besoin d'un argument)
+		()— o : Donner/retirer le privilège de l’opérateur de canal (besoin d'un argument)
+		()— l : Définir/supprimer la limite d’utilisateurs pour le canal ()*/
+	/* Pour l'instant je suis parti du principe que tu peux m'envoyer un seul operator + ou -, et tous les modes en meme temps sans doublon
+	ce qui fait donc au max 3 argument  */
+	int pos_argument = 0;
+	
+	if (hasDuplicates(modestring))
+		return ;//erreur doublon
+	if (this->foundOperator(user->getNickname()) == false)
+		return (user->sendReply((user->getNickname(), channel)));//seul un operator peut changer les modes, je le fais que mtn car il me semble qu'un User peut lancer la commande Mode sans rien
+	if(modestring[0] == '+' || modestring[0] == '-')//pour l'instant j'aurtorise que l'un des deux mais je peux sinon mettre en place la possibilite de swap entre les deux mais faudra changer la fonction qui check les duplicates
+	{
+		/* pour gerer le plus et le moins en meme temps, on peut juste rajouter (dans la boucle et avant):
+		int operator = 0;
+		if(modestring[i] == '+')
+			operator = 0
+		if(modestring[i] == '-')
+			operator =  1
+		puis envoyer operator au lieu de modestring dans les fonction*/
+		
+		for (size_t i = 1; i < modestring.size(); i++) 
+		{
+			if (modestring[i] == 'i')
+				set_inviteMode(modestring);
+			if (modestring[i] == 't')
+				set_topicMode(modestring);
+			if (modestring[i] == 'k')
+			{
+				set_key(argument, pos_argument, modestring);
+				pos_argument++;
+			}
+			if (modestring[i] == 'o')
+			{
+				set_op(user, argument, pos_argument, modestring);
+				pos_argument++;
+			}
+			if (modestring[i] == 'l')
+			{
+				set_maxUsers(argument, pos_argument, modestring);
+				pos_argument++;
+			}
+		}
+			
+	}
+	else
+		return ; //erreur car il ne commence pas par + ou -
 }
