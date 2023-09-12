@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerCmds.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zheylkoss <zheylkoss@student.42.fr>        +#+  +:+       +#+        */
+/*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 16:23:13 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/12 02:21:04 by zheylkoss        ###   ########.fr       */
+/*   Updated: 2023/09/12 19:07:17 by zhamdouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ void Server::_indexingCmd()
 	_indexCmd.insert(std::pair<std::string, func>("KICK", &Server::_kickCmd));
 	_indexCmd.insert(std::pair<std::string, func>("MODE", &Server::_modeCmd));
 	_indexCmd.insert(std::pair<std::string, func>("TOPIC", &Server::_topicCmd));
+	_indexCmd.insert(std::pair<std::string, func>("WHO", &Server::_whoCmd));
 }
 
 void Server::_parseCmd(User *user)
@@ -385,19 +386,23 @@ void	Server::_modeCmd(User *user, std::string param)
 			return (user->sendReply(ERR_NOTONCHANNEL(user->getNickname(), channel)));//message d'erreur il n'est pas dans le channel 
 		if (argument.empty() && modestring.empty())
 		{
-			return (user->sendReply(RPL_CHANNELMODEIS(user->getServer(), user->getNickname(), channel, modestring, argument)));//envoyer quelles sont les modes actif -> RPL_CHANNELMODEIS + RPL_CREATIONTIME
-			//est ce qu'on doit faire deux fonctions dans notre classe channel, une qui renvoie un modestring et une autre les argument pour justement envoyer les modes actuallises
-			//donc les set permettront juste d'ecrire les changements qui ont ete demande et qui ont valide les conditins, et le RPL enverra un resume des nouveaux modes a chacun (on pourra ainsi cacher les informations telle que le mot de passe )
+			user->sendReply(RPL_CHANNELMODEIS(user->getServer(), user->getNickname(), channel, this->_channels[channel]->getModestring()));
+			this->_channels[channel]->sendMessage(user, RPL_CHANNELMODEIS(user->getServer(), user->getNickname(), channel, this->_channels[channel]->getModestring()));
+			this->_channels[channel]->sendMessage(user, RPL_CREATIONTIME(user->getServer(), user->getNickname(), channel, this->_channels[channel]->getCreationDate()));
+			return (user->sendReply(RPL_CREATIONTIME(user->getServer(), user->getNickname(), channel, this->_channels[channel]->getCreationDate())));
 		}
+		if (modestring == "b")
+			return (user->sendReply(":" + user->getServer() + " 368 " + user->getNickname() + channel + " :End of channel ban list"));
 		size_t pos = modestring.find_first_not_of("+-itkol");
 		if (pos != std::string::npos)
 			return (user->sendReply(ERR_UNKNOWNMODE(user->getNickname(), modestring.substr(pos, 1))));// on m'envoie un mauvais modestring
 		if (this->_channels[channel]->foundOperator(user->getNickname()) == false)
-			return (user->sendReply((user->getNickname(), channel)));//seul un operator peut changer les modes, je le fais que mtn car il me semble qu'un User peut lancer la commande Mode sans rien
+			return (user->sendReply(ERR_CHANOPRIVSNEEDED(user->getNickname(), channel)));//seul un operator peut changer les modes, je le fais que mtn car il me semble qu'un User peut lancer la commande Mode sans rien
 		this->_channels[channel]->modeChannel(user, modestring, argument);
-		return(user->sendReply(RPL_CHANNELMODEIS(user->getServer(), user->getNickname(), channel, modestring, argument)));//il manque le RPL numero 329
-		//je pense qu'on peu un par un pour les RPL_CHANNELDOIS pour gerer au cas par cas et aussi pour cacher certaines informations comme le mot de passe en argument
-		//sinon il faut qu'on declare 2 string qu'on envoie partout en reference auquel on ajoute au fur et a mesure les "set" qui ont pu etre execute pour ensuite l'envoyer a RPL
+		user->sendReply(RPL_CHANNELMODEIS(user->getServer(), user->getNickname(), channel, this->_channels[channel]->getModestring()));
+		this->_channels[channel]->sendMessage(user, RPL_CHANNELMODEIS(user->getServer(), user->getNickname(), channel, this->_channels[channel]->getModestring()));
+		this->_channels[channel]->sendMessage(user, RPL_CREATIONTIME(user->getServer(), user->getNickname(), channel, this->_channels[channel]->getCreationDate()));
+		return (user->sendReply(RPL_CREATIONTIME(user->getServer(), user->getNickname(), channel, this->_channels[channel]->getCreationDate())));
 	}
 	else
 		return ;
@@ -444,4 +449,16 @@ void	Server::_topicCmd(User *user, std::string param)
 		user->sendReply(RPL_TOPIC(user->getNickname(), user->getServer(), channel, this->_channels[channel]->getTopic()));
 		return (user->sendReply(RPL_TOPICWHOTIME(user->getNickname(), user->getServer(), channel, this->_channels[channel]->getTopicUser(), this->_channels[channel]->getTopicDate())));
 	}
+}
+
+void	Server::_whoCmd(User *user, std::string param)
+{
+	if (param[0] != '#')
+		return ; // ON GERE PAS, ON FAIT QUE LES CHANNELS
+	std::map<std::string, Channel*>::iterator it;
+	it = this->_channels.find(param);
+	if (it == this->_channels.end())
+		return (user->sendReply(ERR_NOSUCHCHANNEL(user->getNickname(), param)));
+	it->second->whoList();
+	return (user->sendReply(":" + user->getServer() + " 315 "+ user->getNickname() + ' ' + param + " :End of WHO list"));
 }

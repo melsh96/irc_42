@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zheylkoss <zheylkoss@student.42.fr>        +#+  +:+       +#+        */
+/*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 17:16:21 by fbily             #+#    #+#             */
-/*   Updated: 2023/09/12 02:02:59 by zheylkoss        ###   ########.fr       */
+/*   Updated: 2023/09/12 18:58:14 by zhamdouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ class Channel
 		std::vector<User *> _Invited;
 		std::string			_topicTime;
 		std::string			_topicUser;
+		std::string			_creationDate;
 		Channel();
 		Channel(const Channel& obj);
 		Channel& operator=(const Channel& rhs);
@@ -48,20 +49,23 @@ class Channel
 		unsigned int	getMaxUsers() const;
 		std::string		getTopicDate() const;
 		std::string		getTopicUser() const;
-		User			*returnOperator(std::string nickname); // ajouter const ?
-		User			*returnUser(std::string nickname); // ajouter const ?
+		std::string		getCreationDate() const;
+		std::string		getModestring() const;
+		User			*returnOperator(std::string nickname);
+		User			*returnUser(std::string nickname);
 		
-		void			set_inviteMode(int sign);
-		void			set_topicMode(int sign);
-		void			set_key(std::string argument, int pos_argument, int sign);
+		void			set_inviteMode(User *user, int sign);
+		void			set_topicMode(User *user, int sign);
+		void			set_key(User *user, std::string argument, int pos_argument, int sign);
 		void			set_op(User *user, std::string argument, int pos_argument, int sign);
-		void			set_maxUsers(std::string argument, int pos_argument, int sign);
+		void			set_maxUsers(User *user, std::string argument, int pos_argument, int sign);
 		void			setTopic(User *user, std::string newTopic);
 		
 		std::string		joinChannel(std::string key, User *user);
 		void			kickUser(User *user, std::string target, std::string comment);
 		void			modeChannel(User *user, std::string modestring, std::string argument);
 		void			sendMessage(User *user, std::string message);
+		void			whoList();
 
 		bool 			foundInvited(std::string nickname);
 		bool 			foundUser(std::string nickname);

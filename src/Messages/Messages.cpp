@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Messages.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zheylkoss <zheylkoss@student.42.fr>        +#+  +:+       +#+        */
+/*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 10:57:59 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/12 01:43:12 by zheylkoss        ###   ########.fr       */
+/*   Updated: 2023/09/12 16:25:26 by zhamdouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,8 +68,8 @@ std::string RPL_INVITING(std::string nick, std::string server, std::string chann
 }
 
 //"<client> <channel> <modestring> <mode arguments>..."
-std::string RPL_CHANNELMODEIS(std::string server, std::string client, std::string channel, std::string modestring, std::string argument){
-	return (":" + server + " 324 " + client + ' ' + channel + ' ' + modestring + ' ' + argument);
+std::string RPL_CHANNELMODEIS(std::string server, std::string client, std::string channel, std::string modestring){
+	return (":" + server + " 324 " + client + ' ' + channel + ' ' + modestring);
 }
 
 //"<client> <channel> <modestring> <mode arguments>..."

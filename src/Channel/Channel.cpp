@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zheylkoss <zheylkoss@student.42.fr>        +#+  +:+       +#+        */
+/*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 17:28:51 by fbily             #+#    #+#             */
-/*   Updated: 2023/09/12 02:02:47 by zheylkoss        ###   ########.fr       */
+/*   Updated: 2023/09/12 18:57:27 by zhamdouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,11 @@ Channel::Channel(const Channel& obj)
 
 Channel::Channel(std::string name, std::string key, User *user) : _name(name), _key(key), _inviteMode(false), _maxUsers(0), _nbUser(1)
 {
+	time_t now = time(0);
+	std::ostringstream oss;
+	oss << now;
 	this->_Operators.push_back(user);
+	this->_creationDate = oss.str();
 	//Set les autres variable : voir doc pour cas par default
 }
 
@@ -64,6 +68,33 @@ std::string	Channel::getTopicDate() const
 std::string	Channel::getTopicUser() const
 {
 	return (this->_topicUser);
+}
+
+std::string Channel::getCreationDate() const
+{
+	return (this->_creationDate);
+}
+
+std::string Channel::getModestring() const
+{
+	std::string	modestring = "+";
+
+	if (this->_inviteMode)
+		modestring.append("i");
+	if (this->_topicMode)
+		modestring.append("t");
+	if (this->_key != "")
+		modestring.append("k");
+	if (this->_maxUsers != 0)
+	{
+		std::ostringstream oss;
+		oss << this->_maxUsers;
+		modestring.append("l ");
+		modestring.append(oss.str());
+	}
+	if (modestring == "+")
+		modestring.clear();
+	return (modestring);
 }
 
 void Channel::setTopic(User *user, std::string newTopic)
@@ -113,7 +144,6 @@ bool Channel::foundUser(std::string nickname)
 	}
 	return (false);
 }
-
 
 bool Channel::foundOperator(std::string nickname)
 {
@@ -201,6 +231,22 @@ void	Channel::listUsersOnChannel(User *user)
 	user->sendReply(":" + user->getServer() + " 366 " + user->getNickname() + ' ' + this->getName() + " :End of /NAMES list");
 }
 
+void	Channel::whoList()
+{
+	std::vector<User *>::iterator it = this->_Operators.begin();
+	while (it != this->_Operators.end())
+	{
+		(*it)->sendReply(":" + (*it)->getServer() + " 352 " + (*it)->getNickname() + ' ' + this->_name + ' ' + (*it)->getUsername() + ' ' + (*it)->getHostname() + ' ' + (*it)->getServer() + ' ' + (*it)->getNickname() + " @ :0 " + (*it)->getRealname());
+		it++;
+	}
+	it = this->_Users.begin();
+	while (it != this->_Users.end())
+	{
+		(*it)->sendReply(":" + (*it)->getServer() + " 352 " + (*it)->getNickname() + ' ' + this->_name + ' ' + (*it)->getUsername() + ' ' + (*it)->getHostname() + ' ' + (*it)->getServer() + ' ' + (*it)->getNickname() + " H :0 " + (*it)->getRealname());
+		it++;
+	}
+}
+
 bool Channel::hasDuplicates(const std::string& str) 
 {
 	if(str.size() > 6 )
@@ -216,27 +262,45 @@ bool Channel::hasDuplicates(const std::string& str)
     return false;
 }
 
-void	Channel::set_inviteMode(int sign)
+void	Channel::set_inviteMode(User *user, int sign)
 {
 	if (sign == 1)
+	{
 		this->_inviteMode = true;
+		user->sendReply(":" + user->getNickname() + " MODE " + this->_name + " +i");
+		sendMessage(user, ":" + user->getNickname() + " MODE " + this->_name + " +i");
+	}
 	if (sign == -1)
+	{
 		this->_inviteMode = false;
+		user->sendReply(":" + user->getNickname() + " MODE " + this->_name + " -i");
+		sendMessage(user, ":" + user->getNickname() + " MODE " + this->_name + " -i");
+	}
 }
 
-void	Channel::set_topicMode(int sign)
+void	Channel::set_topicMode(User *user, int sign)
 {
 	if (sign == 1)
+	{
 		this->_topicMode = true;
+		user->sendReply(":" + user->getNickname() + " MODE " + this->_name + " +t");
+		sendMessage(user, ":" + user->getNickname() + " MODE " + this->_name + " +t");
+	}
 	if (sign == -1)
+	{
 		this->_topicMode = false;
+		user->sendReply(":" + user->getNickname() + " MODE " + this->_name + " -t");
+		sendMessage(user, ":" + user->getNickname() + " MODE " + this->_name + " -t");
+	}
 }
 
-void	Channel::set_key(std::string argument, int pos_argument, int sign)
+void	Channel::set_key(User *user, std::string argument, int pos_argument, int sign)
 {
 	if (sign == -1)
 	{
-		this->_key = "";//supprimer le mot de passe ou mettre '\0'
+		this->_key = "";
+		user->sendReply(":" + user->getNickname() + " MODE " + this->_name + " -k");
+		sendMessage(user, ":" + user->getNickname() + " MODE " + this->_name + " -k");
 		return ;
 	}
 	std::string arg_1;
@@ -259,8 +323,11 @@ void	Channel::set_key(std::string argument, int pos_argument, int sign)
 		pos_bis++;
 	}
 	if (!argument.empty())
+	{
 		this->_key = arg_1;
-	//quoi faire si on a fait +k mais sans argument
+		user->sendReply(":" + user->getNickname() + " MODE " + this->_name + " +k");
+		sendMessage(user, ":" + user->getNickname() + " MODE " + this->_name + " +k");
+	}
 }
 
 void	Channel::kickModeOperator(std::string target)
@@ -323,7 +390,6 @@ void	Channel::set_op(User *user, std::string argument, int pos_argument, int sig
 	int pos_bis = 0;
 	size_t pos = 0;
 
-	std::cout << "Sign: " << sign << std::endl;
 	while (!argument.empty() && pos_bis <= pos_argument)
 	{
 		pos = argument.find(' ');
@@ -339,26 +405,21 @@ void	Channel::set_op(User *user, std::string argument, int pos_argument, int sig
 			argument.erase(0, arg_1.length() + 1);// +1 pour supprimer l'espace suivant
 		pos_bis++;
 	}
-	std::cout << "Name: " << arg_1 << std::endl;
 	if (foundOperator(user->getNickname()))
 	{
 		if (sign == -1 && foundOperator(arg_1) == true)
 		{
-			std::cout << "entre en -o : " << arg_1 << std::endl;
 			this->_Users.push_back(returnOperator(arg_1));
 			kickModeOperator(arg_1);
-			if(foundUser(arg_1))
-				std::cout << "Ca a fontionne !! devenu user" << std::endl;
-			//pour tester si c'est bon je peux faire un if qui found operator et un autre qui found USer et print dans les 2 pour voir 
+			user->sendReply(":" + user->getNickname() + " MODE " + this->_name + " -o " + arg_1);
+			sendMessage(user, ":" + user->getNickname() + " MODE " + this->_name + " -o " + arg_1);
 		}
 		if (sign == 1 && foundOperator(arg_1) == false)
 		{
-			std::cout << "entre en +o : " << arg_1 << std::endl;
 			this->_Operators.push_back(returnUser(arg_1));
 			kickModeUser(arg_1);
-			if(foundOperator(arg_1))
-				std::cout << "Ca a fontionne !! devenu " << std::endl;
-			//pour tester si c'est bon je peux faire un if qui found operator et un autre qui found USer et print dans les 2 pour voir
+			user->sendReply(":" + user->getNickname() + " MODE " + this->_name + " +o " + arg_1);
+			sendMessage(user, ":" + user->getNickname() + " MODE " + this->_name + " +o " + arg_1);
 		}
 	}
 	else
@@ -392,12 +453,13 @@ unsigned int	Channel::getMaxUsers() const
 	return (this->_maxUsers);
 }
 
-void	Channel::set_maxUsers(std::string argument, int pos_argument, int sign)
+void	Channel::set_maxUsers(User *user, std::string argument, int pos_argument, int sign)
 {
-	//attention a ce que le nouveau max user ne puisse pas etre inferieur au nombre actuel de user + operator
 	if (sign == -1)
 	{
-		this->_maxUsers = 0;//supprimer la limit
+		this->_maxUsers = 0;
+		user->sendReply(":" + user->getNickname() + " MODE " + this->_name + " -l");
+		sendMessage(user, ":" + user->getNickname() + " MODE " + this->_name + " -l");
 		return ;
 	}
 	//checker quelle est le max pour un channel
@@ -420,10 +482,12 @@ void	Channel::set_maxUsers(std::string argument, int pos_argument, int sign)
 			argument.erase(0, arg_1.length() + 1);// +1 pour supprimer l'espace suivant
 		pos_bis++;
 	}
-	
-	if (!argument.empty())
+	if (!argument.empty() && std::atoi(arg_1.c_str()) > static_cast<int>(this->_nbUser))
+	{
 		this->_maxUsers = std::atoi(arg_1.c_str());
-	//que faire si on ne recoit pas d'argument 
+		user->sendReply(":" + user->getNickname() + " MODE " + this->_name + " +l " + arg_1);
+		sendMessage(user, ":" + user->getNickname() + " MODE " + this->_name + " +l " + arg_1);
+	}
 }
 
 void	Channel::modeChannel(User *user, std::string modestring, std::string argument)
@@ -463,12 +527,12 @@ void	Channel::modeChannel(User *user, std::string modestring, std::string argume
 			if (modestring[i] == '-')
 				sign = -1;
 			if (modestring[i] == 'i')
-				set_inviteMode(sign);
+				set_inviteMode(user, sign);
 			if (modestring[i] == 't')
-				set_topicMode(sign);
+				set_topicMode(user, sign);
 			if (modestring[i] == 'k')
 			{
-				set_key(argument, pos_argument, sign);
+				set_key(user, argument, pos_argument, sign);
 				pos_argument++;
 			}
 			if (modestring[i] == 'o')
@@ -478,7 +542,7 @@ void	Channel::modeChannel(User *user, std::string modestring, std::string argume
 			}
 			if (modestring[i] == 'l')
 			{
-				set_maxUsers(argument, pos_argument, sign);
+				set_maxUsers(user, argument, pos_argument, sign);
 				pos_argument++;
 			}
 		}		

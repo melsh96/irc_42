@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
+/*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/03 14:10:07 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/11 19:04:36 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/12 17:22:45 by zhamdouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,7 @@ class Server {
 		void							_kickCmd(User *user, std::string param);
 		void							_modeCmd(User *user, std::string param);
 		void							_topicCmd(User *user, std::string param);
+		void							_whoCmd(User *user, std::string param);
 
 		void							_clean();
 
