@@ -10,3 +10,4 @@ que se passe t il si on essaye de rejoindre un channel qui n'a pas de key en tap
 
 
 Quand quelqu'un quit le serveur il faut le supprimer de partout (quand on fait /bye et qu'on re rejoint un groupe dans lequel on est deja aucun message de join ne s'affiche)
+verifier que tout les substr qui utilise find.(" ") sont bien proteger
