@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
+/*   By: zheylkoss <zheylkoss@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 17:28:51 by fbily             #+#    #+#             */
-/*   Updated: 2023/09/11 19:37:00 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/12 02:02:47 by zheylkoss        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -216,25 +216,25 @@ bool Channel::hasDuplicates(const std::string& str)
     return false;
 }
 
-void	Channel::set_inviteMode(std::string modestring)
+void	Channel::set_inviteMode(int sign)
 {
-	if (modestring[0] == '+')
+	if (sign == 1)
 		this->_inviteMode = true;
-	if (modestring[0] == '-')
+	if (sign == -1)
 		this->_inviteMode = false;
 }
 
-void	Channel::set_topicMode(std::string modestring)
+void	Channel::set_topicMode(int sign)
 {
-	if (modestring[0] == '+')
+	if (sign == 1)
 		this->_topicMode = true;
-	if (modestring[0] == '-')
+	if (sign == -1)
 		this->_topicMode = false;
 }
 
-void	Channel::set_key(std::string argument, int pos_argument, std::string modestring)
+void	Channel::set_key(std::string argument, int pos_argument, int sign)
 {
-	if (modestring[0] == '-')
+	if (sign == -1)
 	{
 		this->_key = "";//supprimer le mot de passe ou mettre '\0'
 		return ;
@@ -317,12 +317,13 @@ User* Channel::returnUser(std::string nickname)
 	return (*it);
 }
 
-void	Channel::set_op(User *user, std::string argument, int pos_argument, std::string modestring)
+void	Channel::set_op(User *user, std::string argument, int pos_argument, int sign)
 {
 	std::string arg_1;
 	int pos_bis = 0;
 	size_t pos = 0;
 
+	std::cout << "Sign: " << sign << std::endl;
 	while (!argument.empty() && pos_bis <= pos_argument)
 	{
 		pos = argument.find(' ');
@@ -338,27 +339,27 @@ void	Channel::set_op(User *user, std::string argument, int pos_argument, std::st
 			argument.erase(0, arg_1.length() + 1);// +1 pour supprimer l'espace suivant
 		pos_bis++;
 	}
-
+	std::cout << "Name: " << arg_1 << std::endl;
 	if (foundOperator(user->getNickname()))
 	{
-		if (!argument.empty() && foundOperator(arg_1))
+		if (sign == -1 && foundOperator(arg_1) == true)
 		{
-			if (modestring[0] == '-')
-			{
-				this->_Users.push_back(returnOperator(arg_1));
-				kickModeOperator(arg_1);
-				//pour tester si c'est bon je peux faire un if qui found operator et un autre qui found USer et print dans les 2 pour voir 
-			}
-			if (modestring[0] == '+')
-			{
-				this->_Operators.push_back(returnOperator(arg_1));
-				kickModeUser(arg_1);
-				//pour tester si c'est bon je peux faire un if qui found operator et un autre qui found USer et print dans les 2 pour voir
-			}
+			std::cout << "entre en -o : " << arg_1 << std::endl;
+			this->_Users.push_back(returnOperator(arg_1));
+			kickModeOperator(arg_1);
+			if(foundUser(arg_1))
+				std::cout << "Ca a fontionne !! devenu user" << std::endl;
+			//pour tester si c'est bon je peux faire un if qui found operator et un autre qui found USer et print dans les 2 pour voir 
 		}
-		else
-			return ;//on ne peut pas retirer le privilege a un User
-		
+		if (sign == 1 && foundOperator(arg_1) == false)
+		{
+			std::cout << "entre en +o : " << arg_1 << std::endl;
+			this->_Operators.push_back(returnUser(arg_1));
+			kickModeUser(arg_1);
+			if(foundOperator(arg_1))
+				std::cout << "Ca a fontionne !! devenu " << std::endl;
+			//pour tester si c'est bon je peux faire un if qui found operator et un autre qui found USer et print dans les 2 pour voir
+		}
 	}
 	else
 		return ; //Un user ne peut pas retirer de privilege
@@ -391,10 +392,10 @@ unsigned int	Channel::getMaxUsers() const
 	return (this->_maxUsers);
 }
 
-void	Channel::set_maxUsers(std::string argument, int pos_argument, std::string modestring)
+void	Channel::set_maxUsers(std::string argument, int pos_argument, int sign)
 {
 	//attention a ce que le nouveau max user ne puisse pas etre inferieur au nombre actuel de user + operator
-	if (modestring[0] == '-')
+	if (sign == -1)
 	{
 		this->_maxUsers = 0;//supprimer la limit
 		return ;
@@ -425,7 +426,7 @@ void	Channel::set_maxUsers(std::string argument, int pos_argument, std::string m
 	//que faire si on ne recoit pas d'argument 
 }
 
-void	Channel::modeChannel(User *user, std::string modestring, std::string argument, std::string channel)
+void	Channel::modeChannel(User *user, std::string modestring, std::string argument)
 {
 	/* est ce que on doit envoyer un message si on essaye de mettre a vrai une valeur deja vrai
 	quelle erreur envoyer en cas de muavais modestring */
@@ -438,11 +439,10 @@ void	Channel::modeChannel(User *user, std::string modestring, std::string argume
 	/* Pour l'instant je suis parti du principe que tu peux m'envoyer un seul operator + ou -, et tous les modes en meme temps sans doublon
 	ce qui fait donc au max 3 argument  */
 	int pos_argument = 0;
+	int sign = 0;
 	
 	//if (hasDuplicates(modestring))
 	//	return ;//erreur doublon
-	if (this->foundOperator(user->getNickname()) == false)
-		return (user->sendReply((user->getNickname(), channel)));//seul un operator peut changer les modes, je le fais que mtn car il me semble qu'un User peut lancer la commande Mode sans rien
 	if(modestring[0] == '+' || modestring[0] == '-')//pour l'instant j'aurtorise que l'un des deux mais je peux sinon mettre en place la possibilite de swap entre les deux mais faudra changer la fonction qui check les duplicates
 	{
 		/* pour gerer le plus et le moins en meme temps, on peut juste rajouter (dans la boucle et avant):
@@ -452,26 +452,33 @@ void	Channel::modeChannel(User *user, std::string modestring, std::string argume
 		if(modestring[i] == '-')
 			operator =  1
 		puis envoyer operator au lieu de modestring dans les fonction*/
-		
+		if(modestring[0] == '+')
+			sign = 1;
+		if(modestring[0] == '-')
+			sign = -1;
 		for (size_t i = 1; i < modestring.size(); i++) 
 		{
+			if (modestring[i] == '+')
+				sign = 1;
+			if (modestring[i] == '-')
+				sign = -1;
 			if (modestring[i] == 'i')
-				set_inviteMode(modestring);
+				set_inviteMode(sign);
 			if (modestring[i] == 't')
-				set_topicMode(modestring);
+				set_topicMode(sign);
 			if (modestring[i] == 'k')
 			{
-				set_key(argument, pos_argument, modestring);
+				set_key(argument, pos_argument, sign);
 				pos_argument++;
 			}
 			if (modestring[i] == 'o')
 			{
-				set_op(user, argument, pos_argument, modestring);
+				set_op(user, argument, pos_argument, sign);
 				pos_argument++;
 			}
 			if (modestring[i] == 'l')
 			{
-				set_maxUsers(argument, pos_argument, modestring);
+				set_maxUsers(argument, pos_argument, sign);
 				pos_argument++;
 			}
 		}		

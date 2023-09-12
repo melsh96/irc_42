@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Messages.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
+/*   By: zheylkoss <zheylkoss@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 10:58:08 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/11 19:32:24 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/12 01:39:38 by zheylkoss        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,8 @@ std::string RPL_TOPICWHOTIME(std::string nick, std::string server, std::string c
 std::string RPL_NAMREPLY(std::string nick, std::string server, std::string channel, std::string user);
 std::string RPL_ENDOFNAMES(std::string nick, std::string server, std::string channel);
 std::string RPL_INVITING(std::string nick, std::string server, std::string channel, std::string user);
+std::string RPL_CHANNELMODEIS(std::string server, std::string client, std::string channel, std::string modestring, std::string argument);
+std::string RPL_CREATIONTIME(std::string server, std::string client, std::string channel, std::string creationtime);
 
 
 std::string ERR_NOSUCHSERVER(std::string nick, std::string arg);

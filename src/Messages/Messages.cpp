@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Messages.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
+/*   By: zheylkoss <zheylkoss@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 10:57:59 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/11 19:32:17 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/12 01:43:12 by zheylkoss        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,15 @@ std::string RPL_INVITING(std::string nick, std::string server, std::string chann
 	return (":" + server + " 341 " + nick + ' ' + user + ' ' + channel);
 }
 
+//"<client> <channel> <modestring> <mode arguments>..."
+std::string RPL_CHANNELMODEIS(std::string server, std::string client, std::string channel, std::string modestring, std::string argument){
+	return (":" + server + " 324 " + client + ' ' + channel + ' ' + modestring + ' ' + argument);
+}
+
+//"<client> <channel> <modestring> <mode arguments>..."
+std::string RPL_CREATIONTIME(std::string server, std::string client, std::string channel, std::string creationtime){
+	return (":" + server + " 329 " + client + ' ' + channel + ' ' +  creationtime);
+}
 
 //"<client> <server name> :No such server"
 std::string ERR_NOSUCHSERVER(std::string nick, std::string arg) {

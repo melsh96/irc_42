@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerCmds.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
+/*   By: zheylkoss <zheylkoss@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 16:23:13 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/11 18:50:23 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/12 02:21:04 by zheylkoss        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -370,28 +370,38 @@ void	Server::_modeCmd(User *user, std::string param)
 	std::string argument;
 
 	channel = param.substr(0, param.find(' '));
-	modestring = param.substr(param.find(' ') + 1);
+	if (param.find(' ') != std::string::npos)
+		modestring = param.substr(param.find(' ') + 1);
 	if (modestring.find(' ') != std::string::npos)
 	{
 		argument = modestring.substr(modestring.find(' ') + 1);
 		modestring.erase(modestring.find(' '), argument.length() + 1);
 	}
-
 	if (channel[0] == '#')
 	{
 		if (this->_channels.find(channel) == this->_channels.end())
 			return (user->sendReply(ERR_NOSUCHCHANNEL(user->getNickname(), channel)));//verifier si c'est le bon message
 		if(this->_channels[channel]->foundUser(user->getNickname()) == false && this->_channels[channel]->foundOperator(user->getNickname()) == false)
 			return (user->sendReply(ERR_NOTONCHANNEL(user->getNickname(), channel)));//message d'erreur il n'est pas dans le channel 
-		if (modestring.empty() && argument.empty())
-			return ;//envoyer quelles sont les modes actif -> RPL_CHANNELMODEIS + RPL_CREATIONTIME
+		if (argument.empty() && modestring.empty())
+		{
+			return (user->sendReply(RPL_CHANNELMODEIS(user->getServer(), user->getNickname(), channel, modestring, argument)));//envoyer quelles sont les modes actif -> RPL_CHANNELMODEIS + RPL_CREATIONTIME
+			//est ce qu'on doit faire deux fonctions dans notre classe channel, une qui renvoie un modestring et une autre les argument pour justement envoyer les modes actuallises
+			//donc les set permettront juste d'ecrire les changements qui ont ete demande et qui ont valide les conditins, et le RPL enverra un resume des nouveaux modes a chacun (on pourra ainsi cacher les informations telle que le mot de passe )
+		}
 		size_t pos = modestring.find_first_not_of("+-itkol");
 		if (pos != std::string::npos)
 			return (user->sendReply(ERR_UNKNOWNMODE(user->getNickname(), modestring.substr(pos, 1))));// on m'envoie un mauvais modestring
-		this->_channels[channel]->modeChannel(user, modestring, argument, channel);
+		if (this->_channels[channel]->foundOperator(user->getNickname()) == false)
+			return (user->sendReply((user->getNickname(), channel)));//seul un operator peut changer les modes, je le fais que mtn car il me semble qu'un User peut lancer la commande Mode sans rien
+		this->_channels[channel]->modeChannel(user, modestring, argument);
+		return(user->sendReply(RPL_CHANNELMODEIS(user->getServer(), user->getNickname(), channel, modestring, argument)));//il manque le RPL numero 329
+		//je pense qu'on peu un par un pour les RPL_CHANNELDOIS pour gerer au cas par cas et aussi pour cacher certaines informations comme le mot de passe en argument
+		//sinon il faut qu'on declare 2 string qu'on envoie partout en reference auquel on ajoute au fur et a mesure les "set" qui ont pu etre execute pour ensuite l'envoyer a RPL
 	}
 	else
-		return (user->sendReply(ERR_NOSUCHCHANNEL(user->getNickname(), channel)));// On garde ou pas ? Comment on fait pour gerer le Mode +i suite a la connection d'user ?
+		return ;
+		//return (user->sendReply(ERR_NOSUCHCHANNEL(user->getNickname(), channel)));// On garde ou pas ? Comment on fait pour gerer le Mode +i suite a la connection d'user ?
 }
 
 void	Server::_topicCmd(User *user, std::string param)

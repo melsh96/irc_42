@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
+/*   By: zheylkoss <zheylkoss@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 17:16:21 by fbily             #+#    #+#             */
-/*   Updated: 2023/09/11 19:34:53 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/12 02:02:59 by zheylkoss        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,16 +51,16 @@ class Channel
 		User			*returnOperator(std::string nickname); // ajouter const ?
 		User			*returnUser(std::string nickname); // ajouter const ?
 		
-		void			set_inviteMode(std::string modestring);
-		void			set_topicMode(std::string modestring);
-		void			set_key(std::string argument, int pos_argument, std::string modestring);
-		void			set_op(User *user, std::string argument, int pos_argument, std::string modestring);
-		void			set_maxUsers(std::string argument, int pos_argument, std::string modestring);
+		void			set_inviteMode(int sign);
+		void			set_topicMode(int sign);
+		void			set_key(std::string argument, int pos_argument, int sign);
+		void			set_op(User *user, std::string argument, int pos_argument, int sign);
+		void			set_maxUsers(std::string argument, int pos_argument, int sign);
 		void			setTopic(User *user, std::string newTopic);
 		
 		std::string		joinChannel(std::string key, User *user);
 		void			kickUser(User *user, std::string target, std::string comment);
-		void			modeChannel(User *user, std::string modestring, std::string argument, std::string channel);
+		void			modeChannel(User *user, std::string modestring, std::string argument);
 		void			sendMessage(User *user, std::string message);
 
 		bool 			foundInvited(std::string nickname);

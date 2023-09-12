@@ -7,3 +7,6 @@ Quand on utilise "#" pour le nom d'un channel cela veut dire que le channel est 
 Quand on utilise "&" pour le nom d'un channel cela veut dire qu'il est lie a un seul server.
 
 que se passe t il si on essaye de rejoindre un channel qui n'a pas de key en tapant un key en le rejoignant 
+
+
+Quand quelqu'un quit le serveur il faut le supprimer de partout (quand on fait /bye et qu'on re rejoint un groupe dans lequel on est deja aucun message de join ne s'affiche)
