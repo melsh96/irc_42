@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Messages.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 10:57:59 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/12 16:25:26 by zhamdouc         ###   ########.fr       */
+/*   Updated: 2023/09/13 16:50:37 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ std::string RPL_TOPIC(std::string nick, std::string server, std::string channel,
 
 //"<client> <channel> :No topic is set"
 std::string RPL_NOTOPIC(std::string nick, std::string server, std::string channel){
-	return (":" + server + " 331 " + nick + ' ' + channel + ":No topic is set");
+	return (":" + server + " 331 " + nick + ' ' + channel + " :No topic is set");
 }
 
 //"<client> <channel> <nick> <setat>"
@@ -59,7 +59,7 @@ std::string RPL_NAMREPLY(std::string nick, std::string server, std::string chann
 
 //"<client> <channel> :End of /NAMES list"
 std::string RPL_ENDOFNAMES(std::string nick, std::string server, std::string channel){
-	return (":" + server + " 366 " + nick + ' ' + channel + ":End of /NAMES list");
+	return (":" + server + " 366 " + nick + ' ' + channel + " :End of /NAMES list");
 }
 
 //"<client> <nick> <channel>"
@@ -79,7 +79,7 @@ std::string RPL_CREATIONTIME(std::string server, std::string client, std::string
 
 //"<client> <server name> :No such server"
 std::string ERR_NOSUCHSERVER(std::string nick, std::string arg) {
-	return "402 " + nick + ": " + arg + ":No such server";
+	return "402 " + nick + ": " + arg + " :No such server";
 }
 
 //"<client> :Password incorrect"
@@ -89,17 +89,17 @@ std::string ERR_PASSWDMISMATCH(std::string nick) {
 
 //"<client> :No nickname given"
 std::string ERR_NONICKNAMEGIVEN(std::string nick) {
-	return "431 " + (nick.empty() ?  "*" : nick) + ":No nickname given";
+	return "431 " + (nick.empty() ?  "*" : nick) + " :No nickname given";
 }
 
 //"<client> <nick> :Nickname collision KILL from <user>@<host>"
 std::string ERR_NICKCOLLISION(std::string nick) {
-	return "436 " + nick + ":Nickname collision";
+	return "436 " + nick + " :Nickname collision";
 }
 
 //"<client> :You may not reregister"
 std::string ERR_ALREADYREGISTERED(std::string nick) {
-	return "462 " + nick + ":You may not reregister";
+	return "462 " + nick + " :You may not reregister";
 }
 
 //"<client> <command> :Not enough parameters"
@@ -109,42 +109,42 @@ std::string ERR_NEEDMOREPARAMS(std::string nick, std::string arg) {
 
 //"<client> <channel> :Cannot join channel (+k)"
 std::string ERR_BADCHANNELKEY(std::string nick, std::string channel){
-	return ("475 " + nick + ' ' + channel + ":Cannot join channel (+k)");
+	return ("475 " + nick + ' ' + channel + " :Cannot join channel (+k)");
 }
 
 //"<client> <channel> :Cannot join channel (+l)"
 std::string ERR_CHANNELISFULL(std::string nick, std::string channel){
-	return ("471 " + nick + ' ' + channel + ":Cannot join channel (+l)");
+	return ("471 " + nick + ' ' + channel + " :Cannot join channel (+l)");
 }
 
 //"<client> <channel> :Cannot join channel (+i)"
 std::string ERR_INVITEONLYCHAN(std::string nick, std::string channel){
-	return ("473 " + nick + ' ' + channel + ":Cannot join channel (+i)");
+	return ("473 " + nick + ' ' + channel + " :Cannot join channel (+i)");
 }
 
 //"<client> <channel> :No such channel"
 std::string ERR_NOSUCHCHANNEL(std::string nick, std::string channel){
-	return ("403 " + nick + ' ' + channel + ":No such channel");
+	return ("403 " + nick + ' ' + channel + " :No such channel");
 }
 
 //"<client> <channel> :You're not channel operator"
 std::string ERR_CHANOPRIVSNEEDED(std::string nick, std::string channel){
-	return ("482 " + nick + ' ' + channel + ":You're not channel operator");
+	return ("482 " + nick + ' ' + channel + " :You're not channel operator");
 }
 
 //"<client> <nick> <channel> :They aren't on that channel"
 std::string ERR_USERNOTINCHANNEL(std::string nick, std::string channel, std::string user){
-	return ("441 " + nick + ' ' + user + ' ' + channel + ":They aren't on that channel");
+	return ("441 " + nick + ' ' + user + ' ' + channel + " :They aren't on that channel");
 }
 
 //"<client> <channel> :You're not on that channel"
 std::string ERR_NOTONCHANNEL(std::string nick, std::string channel){
-	return ("442 " + nick + ' ' + channel + ":You're not on that channel");
+	return ("442 " + nick + ' ' + channel + " :You're not on that channel");
 }
 
 //"<client> <nick> <channel> :is already on channel"
 std::string ERR_USERONCHANNEL(std::string nick, std::string channel, std::string user){
-	return ("443 " + nick + ' ' + user + ' ' + channel + ":is already on channel");
+	return ("443 " + nick + ' ' + user + ' ' + channel + " :is already on channel");
 }
 
 //"<client> <modechar> :is unknown mode char to me"
@@ -160,11 +160,11 @@ std::string ERR_NOSUCHNICK(std::string nick, std::string user)
 //"<client> <channel> :Cannot send to channel"
 std::string	ERR_CANNOTSENDTOCHAN(std::string nick, std::string channel)
 {
-	return ("404 " + nick + " " + channel + ":Cannot send to channel");
+	return ("404 " + nick + " " + channel + " :Cannot send to channel");
 }
 
 //"<client> :No text to send"
 std::string ERR_NOTEXTTOSEND(std::string nick)
 {
-	return ("412 " + nick + ":No text to send");
+	return ("412 " + nick + " :No text to send");
 }

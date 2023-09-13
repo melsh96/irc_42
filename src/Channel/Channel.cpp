@@ -6,7 +6,7 @@
 /*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 17:28:51 by fbily             #+#    #+#             */
-/*   Updated: 2023/09/13 12:51:41 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/13 15:43:23 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,8 @@ Channel::Channel(const Channel& obj)
 	(void)obj;
 }
 
-Channel::Channel(std::string name, std::string key, User *user) : _name(name), _key(key), _inviteMode(false), _maxUsers(0), _nbUser(1)
+Channel::Channel(std::string name, std::string key, User *user) : _name(name), _topic(""), _key(key), _inviteMode(false), _topicMode(false),
+	_maxUsers(0), _nbUser(1), _topicTime(""), _topicUser("")
 {
 	time_t now = time(0);
 	std::ostringstream oss;

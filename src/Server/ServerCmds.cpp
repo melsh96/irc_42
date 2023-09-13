@@ -6,7 +6,7 @@
 /*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 16:23:13 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/13 13:08:52 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/13 17:58:28 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,7 +148,7 @@ void    Server::_userCmd(User *user, std::string param)
 	user->setUsername(mode);
 	user->setHostname(unused);
 	if (user->getNickname().size() && user->getPassword() && !user->hasBeenWelcomed())
-		user->welcome();
+		user->welcome(this->_creationDate);
 }
 
 void    Server::_pingCmd(User *user, std::string param){
@@ -243,6 +243,7 @@ void	Server::_joinCmd(User *user, std::string param)
 				user->sendReply(":" + user->getServer() + " 332 " + user->getNickname() + ' ' + it->first + " :" + this->_channels[it->first]->getTopic());
 				this->_channels[it->first]->listUsersOnChannel(user);
 			}
+			return ;
 		}
 		else
 		{
@@ -251,6 +252,7 @@ void	Server::_joinCmd(User *user, std::string param)
 			user->sendReply(':' + user->getNickname() + " JOIN " + it->first);
 			user->sendReply(":" + user->getServer() + " 332 " + user->getNickname() + ' ' + it->first + " :" + this->_channels[it->first]->getTopic());
 			this->_channels[it->first]->listUsersOnChannel(user);
+			return ;
 		}
 		it++;
 	}
@@ -314,9 +316,7 @@ void	Server::_privmsgCmd(User *user, std::string param)
 		}
 		if (it == this->_user.end())
 		{
-			// std::cout << rouge << ("HERE") << fin << std::endl;
 			return(user->sendReply(ERR_NOSUCHNICK(user->getNickname(), target)));
-			
 		}
 		return (it->second->sendReply((":" + user->getNickname() + " PRIVMSG " + target + " " + text)));
 	}
@@ -330,10 +330,11 @@ void	Server::_privmsgCmd(User *user, std::string param)
 		}
 		if (it == this->_channels.end())
 			return(user->sendReply(ERR_NOSUCHCHANNEL(user->getNickname(), target)));
-		it->second->sendMessage(user, (":" + user->getNickname() + " PRIVMSG " + target + " " + text));
-		return ;
+		if (it->second->foundUser(user->getNickname()) == true || it->second->foundOperator(user->getNickname()) == true)
+			return (it->second->sendMessage(user, (":" + user->getNickname() + " PRIVMSG " + target + " " + text)));
+		else
+			return (user->sendReply(ERR_CANNOTSENDTOCHAN(user->getNickname(), it->first)));
 	}
-	std::cout << rouge << (":" + user->getNickname() + " PRIVMSG " + target + " " + text) << fin << std::endl;
 }
 
 void	Server::_kickCmd(User *user, std::string param)
@@ -392,7 +393,7 @@ void	Server::_modeCmd(User *user, std::string param)
 			return (user->sendReply(RPL_CREATIONTIME(user->getServer(), user->getNickname(), channel, this->_channels[channel]->getCreationDate())));
 		}
 		if (modestring == "b")
-			return (user->sendReply(":" + user->getServer() + " 368 " + user->getNickname() + channel + " :End of channel ban list"));
+			return (user->sendReply(":" + user->getServer() + " 368 " + user->getNickname() + ' ' + channel + " :End of channel ban list"));
 		size_t pos = modestring.find_first_not_of("+-itkol");
 		if (pos != std::string::npos)
 			return (user->sendReply(ERR_UNKNOWNMODE(user->getNickname(), modestring.substr(pos, 1))));// on m'envoie un mauvais modestring

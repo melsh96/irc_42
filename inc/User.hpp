@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   User.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/03 18:51:42 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/08 11:19:37 by zhamdouc         ###   ########.fr       */
+/*   Updated: 2023/09/13 15:06:55 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,10 +61,10 @@ class User {
 		void                        setPassword(bool password);
 		
 		void                        sendReply(std::string reply);
-		void                        welcome(void);
+		void                        welcome(std::string date);
 		bool                        hasBeenWelcomed(void) const;
 
-		std::string                 timestamp(void);
+		std::string                 timestamp();
 		void						clearMessage(void);
 };
 

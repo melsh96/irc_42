@@ -6,7 +6,7 @@
 /*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/03 18:45:15 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/11 18:55:38 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/13 15:06:28 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,11 +88,11 @@ void    User::setPassword(bool password) {
 	_password = password;
 }
 
-void	User::welcome(void)
+void	User::welcome(std::string date)
 {
 	sendReply(RPL_WELCOME(_nickname, _server, _username, _hostname));
 	sendReply(RPL_YOURHOST(_nickname, _server));
-	sendReply(RPL_CREATED(_nickname, _server, timestamp())); // Remplacer timestamp par une variable qui stock la date de creation du serv ??
+	sendReply(RPL_CREATED(_nickname, _server, date));
 	sendReply(RPL_MYINFO(_nickname, _server));
 	_welcomed = true;
 }
@@ -101,17 +101,17 @@ bool	User::hasBeenWelcomed() const{
 	return (_welcomed);
 }
 
-std::string User::timestamp()
-{
-	time_t now = time(0);
-	struct tm tstruct;
-	char buf[80];
+// std::string User::timestamp()
+// {
+// 	time_t now = time(0);
+// 	struct tm tstruct;
+// 	char buf[80];
 
-	tstruct = *localtime(&now);
-	strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
+// 	tstruct = *localtime(&now);
+// 	strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
 	
-	return (buf);
-}
+// 	return (buf);
+// }
 
 void	User::clearMessage(){
 	_message.clear();

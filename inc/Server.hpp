@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/03 14:10:07 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/12 17:22:45 by zhamdouc         ###   ########.fr       */
+/*   Updated: 2023/09/13 15:07:00 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,7 @@ class Server {
 		std::string						_port;
 		std::string						_password;
 		int								_listenSocket;
+		std::string						_creationDate;
 
 		std::vector<struct pollfd>   	_pollFd;
 		std::map<int, User *>   		_user;
@@ -79,6 +80,7 @@ class Server {
 		void							_whoCmd(User *user, std::string param);
 
 		void							_clean();
+		std::string						_timestamp();
 
 		
 	public:

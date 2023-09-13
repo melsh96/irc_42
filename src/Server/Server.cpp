@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/03 14:10:46 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/08 15:04:02 by zhamdouc         ###   ########.fr       */
+/*   Updated: 2023/09/13 15:44:04 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ Server::Server(std::string port, std::string password)
 	this->_password = password;
 
 	_createServer();
+	this->_creationDate = _timestamp();
 	std::cout << YELLOW("[ SERVER CREATED ]") << std::endl
 			  << std::endl;
 	_indexingCmd();
@@ -48,7 +49,7 @@ Server::Server(std::string port, std::string password)
 
 Server::~Server()
 {
-
+	
 	// std::cout << RED("Default Destructor") << std::endl;
 }
 
@@ -254,4 +255,16 @@ int Server::_getData(User *user)
 	user->setMessage(str); // did not set the message in the user
 
 	return (nbyte);
+}
+
+std::string Server::_timestamp()
+{
+	time_t now = time(0);
+	struct tm tstruct;
+	char buf[80];
+
+	tstruct = *localtime(&now);
+	strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
+	
+	return (buf);
 }
