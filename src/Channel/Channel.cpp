@@ -6,7 +6,7 @@
 /*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 17:28:51 by fbily             #+#    #+#             */
-/*   Updated: 2023/09/13 19:44:27 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/13 20:57:56 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ Channel::Channel(std::string name, std::string key, User *user) : _name(name), _
 	oss << now;
 	this->_Operators.push_back(user);
 	this->_creationDate = oss.str();
-	//Set les autres variable : voir doc pour cas par default
 }
 
 /******		Destructor	******/

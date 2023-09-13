@@ -1,21 +1,16 @@
-verifier ce qu'on fait quand il y a pas de param : 
-	/join "     "
-Channel names are strings (beginning with specified prefix characters). Apart from the requirement of the first character being a valid channel type prefix character; the only restriction on a channel name is that it may not contain any spaces (' ', 0x20), a control G / BELL ('^G', 0x07), or a comma (',', 0x2C) (which is used as a list item separator by the protocol).:
-pas le droit au espace et au virgule
-	/join "4 2"
-Quand on utilise "#" pour le nom d'un channel cela veut dire que le channel est universel (pas lie a un server)
-Quand on utilise "&" pour le nom d'un channel cela veut dire qu'il est lie a un seul server.
-
-que se passe t il si on essaye de rejoindre un channel qui n'a pas de key en tapant un key en le rejoignant 
-
-
-Quand quelqu'un quit le serveur il faut le supprimer de partout (quand on fait /bye et qu'on re rejoint un groupe dans lequel on est deja aucun message de join ne s'affiche)
-verifier que tout les substr qui utilise find.(" ") sont bien proteger
-
-
-
-/ Irssi: critical nicklist_set_host: assertion 'host != NULL' failed >>>>>> AFTER A JOIN CMD
-/ PART a implementer pour join un channel ?
-
+TODO :
 
 /rawlog OPEN ~/Desktop/GitHub/ft_irc/log_flo.txt
+
+/ PART a implementer pour leave un channel ?
+/ nick!user@hostname >>> Recuperer le vrai hostname dans User.cpp/Server.cpp
+		-> changer les RPL / ERR avec le bon hostname
+/ probleme creation multiple channel (bug au dela de 2)
+/ multiple message IRSSI vers NC
+/ changer makefile
+/ corriger leaks
+/ virer user des channel apres deconnexion : QuitCmd ?
+/ guest ne recoit pas invitation channel
+/ changer message quand on tente de kick un op ? (actuellement : No such user)
+/ gerer quand un client (nc) leave avec CTRL^C
+/ voir avec Perrine ; NICKCOLLISON ?

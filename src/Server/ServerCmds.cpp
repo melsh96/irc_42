@@ -6,7 +6,7 @@
 /*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 16:23:13 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/13 19:42:58 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/13 20:56:26 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,6 @@ void Server::_parseCmd(User *user)
 	std::string msg = user->getMessage();
 	std::string cmd;
 	std::string buf;
-
-	// std::cout << WHITE("CHOOSE CMD!") << std::endl;
 
 	while (msg.length())
 	{
@@ -147,6 +145,7 @@ void    Server::_userCmd(User *user, std::string param)
 	user->setRealname(realname);
 	user->setUsername(mode);
 	user->setHostname(unused);
+	//std::cout << rouge << "Param usercmd : " << param << "\nHostname usercmd :"<< unused << fin << std::endl;
 	if (user->getNickname().size() && user->getPassword() && !user->hasBeenWelcomed())
 		user->welcome(this->_creationDate);
 }
@@ -199,6 +198,7 @@ void	Server::_joinCmd(User *user, std::string param)
 	std::map<std::string, std::string>	channel;
 	std::string chans;
 	std::string keys;
+	//std::cout << rouge << "Hostname :" << user->getHostname() << fin << std::endl;
 	if (param.empty())
 		return (user->sendReply(ERR_NEEDMOREPARAMS(user->getNickname(), param)));
 	if (param.find(' ') != std::string::npos)
@@ -237,7 +237,6 @@ void	Server::_joinCmd(User *user, std::string param)
 			// join channel
 			std::string result = this->_channels[it->first]->joinChannel(it->second, user);
 			user->sendReply(result);
-			//if (result == (':' + user->getNickname() +  + " JOIN " + it->first))
 			if (result == (':' + user->getNickname() + "!" + user->getNickname() + "@localhost" + " JOIN " + it->first))
 			{
 				this->_channels[it->first]->sendMessage(user, result);
@@ -374,8 +373,6 @@ void	Server::_modeCmd(User *user, std::string param)
 	std::string channel;
 	std::string modestring;
 	std::string argument;
-	
-	std::cout << rouge << "MODE :" << user->getNickname() << fin << std::endl;
 
 	channel = param.substr(0, param.find(' '));
 	if (param.find(' ') != std::string::npos)
@@ -394,8 +391,6 @@ void	Server::_modeCmd(User *user, std::string param)
 		if (argument.empty() && modestring.empty())
 		{
 			user->sendReply(RPL_CHANNELMODEIS(user->getServer(), user->getNickname(), channel, this->_channels[channel]->getModestring()));
-			//this->_channels[channel]->sendMessage(user, RPL_CHANNELMODEIS(user->getServer(), user->getNickname(), channel, this->_channels[channel]->getModestring()));
-			//this->_channels[channel]->sendMessage(user, RPL_CREATIONTIME(user->getServer(), user->getNickname(), channel, this->_channels[channel]->getCreationDate())); // Si /MODE #42 sans argument, on envoie seulement a l'user ?
 			return (user->sendReply(RPL_CREATIONTIME(user->getServer(), user->getNickname(), channel, this->_channels[channel]->getCreationDate())));
 		}
 		if (modestring == "b")
@@ -460,7 +455,6 @@ void	Server::_topicCmd(User *user, std::string param)
 
 void	Server::_whoCmd(User *user, std::string param)
 {
-	std::cout << rouge << "WHO :" << user->getNickname() << fin << std::endl;
 	if (param[0] != '#')
 		return ; // ON GERE PAS, ON FAIT QUE LES CHANNELS
 	std::map<std::string, Channel*>::iterator it;

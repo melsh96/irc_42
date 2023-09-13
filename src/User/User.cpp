@@ -6,11 +6,12 @@
 /*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/03 18:45:15 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/13 15:06:28 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/13 20:36:02 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/User.hpp"
+#include <unistd.h>
 
 User::User() {
 
@@ -19,8 +20,12 @@ User::User() {
 }
 
 // une des erreurs etait lié aux variables non initialisées et essentiel pour la suite.
-User::User(int fd, struct sockaddr_storage *userAddr) : _password(false), _welcomed(false), _hostname("localhost"), _server("IRC") {
+User::User(int fd, struct sockaddr_storage *userAddr) : _password(false), _welcomed(false), _server("IRC") {
 
+	char hostname[256];
+
+	gethostname(hostname, sizeof(hostname));
+	this->_hostname = hostname;
     this->_fd = fd;
     this->_userAddr = userAddr;
     
@@ -101,17 +106,6 @@ bool	User::hasBeenWelcomed() const{
 	return (_welcomed);
 }
 
-// std::string User::timestamp()
-// {
-// 	time_t now = time(0);
-// 	struct tm tstruct;
-// 	char buf[80];
-
-// 	tstruct = *localtime(&now);
-// 	strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
-	
-// 	return (buf);
-// }
 
 void	User::clearMessage(){
 	_message.clear();
@@ -136,3 +130,15 @@ void	User::sendReply(std::string reply)
 		std::cerr << "Error User::sendReply" << std::endl;
 	}
 }
+
+// std::string User::timestamp()
+// {
+// 	time_t now = time(0);
+// 	struct tm tstruct;
+// 	char buf[80];
+
+// 	tstruct = *localtime(&now);
+// 	strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
+	
+// 	return (buf);
+// }
