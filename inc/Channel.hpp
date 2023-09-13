@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 17:16:21 by fbily             #+#    #+#             */
-/*   Updated: 2023/09/12 18:58:14 by zhamdouc         ###   ########.fr       */
+/*   Updated: 2023/09/13 12:51:05 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ class Channel
 		void			kickUser(User *user, std::string target, std::string comment);
 		void			modeChannel(User *user, std::string modestring, std::string argument);
 		void			sendMessage(User *user, std::string message);
-		void			whoList();
+		void			whoList(User *user);
 
 		bool 			foundInvited(std::string nickname);
 		bool 			foundUser(std::string nickname);

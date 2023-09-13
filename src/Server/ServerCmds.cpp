@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerCmds.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 16:23:13 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/12 19:07:17 by zhamdouc         ###   ########.fr       */
+/*   Updated: 2023/09/13 13:08:52 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -387,8 +387,8 @@ void	Server::_modeCmd(User *user, std::string param)
 		if (argument.empty() && modestring.empty())
 		{
 			user->sendReply(RPL_CHANNELMODEIS(user->getServer(), user->getNickname(), channel, this->_channels[channel]->getModestring()));
-			this->_channels[channel]->sendMessage(user, RPL_CHANNELMODEIS(user->getServer(), user->getNickname(), channel, this->_channels[channel]->getModestring()));
-			this->_channels[channel]->sendMessage(user, RPL_CREATIONTIME(user->getServer(), user->getNickname(), channel, this->_channels[channel]->getCreationDate()));
+			//this->_channels[channel]->sendMessage(user, RPL_CHANNELMODEIS(user->getServer(), user->getNickname(), channel, this->_channels[channel]->getModestring()));
+			//this->_channels[channel]->sendMessage(user, RPL_CREATIONTIME(user->getServer(), user->getNickname(), channel, this->_channels[channel]->getCreationDate())); // Si /MODE #42 sans argument, on envoie seulement a l'user ?
 			return (user->sendReply(RPL_CREATIONTIME(user->getServer(), user->getNickname(), channel, this->_channels[channel]->getCreationDate())));
 		}
 		if (modestring == "b")
@@ -401,7 +401,7 @@ void	Server::_modeCmd(User *user, std::string param)
 		this->_channels[channel]->modeChannel(user, modestring, argument);
 		user->sendReply(RPL_CHANNELMODEIS(user->getServer(), user->getNickname(), channel, this->_channels[channel]->getModestring()));
 		this->_channels[channel]->sendMessage(user, RPL_CHANNELMODEIS(user->getServer(), user->getNickname(), channel, this->_channels[channel]->getModestring()));
-		this->_channels[channel]->sendMessage(user, RPL_CREATIONTIME(user->getServer(), user->getNickname(), channel, this->_channels[channel]->getCreationDate()));
+		this->_channels[channel]->sendMessage(user, RPL_CREATIONTIME(user->getServer(), user->getNickname(), channel, this->_channels[channel]->getCreationDate())); // Ici on envoie les modifs a tout les user.
 		return (user->sendReply(RPL_CREATIONTIME(user->getServer(), user->getNickname(), channel, this->_channels[channel]->getCreationDate())));
 	}
 	else
@@ -459,6 +459,6 @@ void	Server::_whoCmd(User *user, std::string param)
 	it = this->_channels.find(param);
 	if (it == this->_channels.end())
 		return (user->sendReply(ERR_NOSUCHCHANNEL(user->getNickname(), param)));
-	it->second->whoList();
+	it->second->whoList(user);
 	return (user->sendReply(":" + user->getServer() + " 315 "+ user->getNickname() + ' ' + param + " :End of WHO list"));
 }

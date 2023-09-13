@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 17:28:51 by fbily             #+#    #+#             */
-/*   Updated: 2023/09/12 18:57:27 by zhamdouc         ###   ########.fr       */
+/*   Updated: 2023/09/13 12:51:41 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -231,18 +231,18 @@ void	Channel::listUsersOnChannel(User *user)
 	user->sendReply(":" + user->getServer() + " 366 " + user->getNickname() + ' ' + this->getName() + " :End of /NAMES list");
 }
 
-void	Channel::whoList()
+void	Channel::whoList(User *user)
 {
 	std::vector<User *>::iterator it = this->_Operators.begin();
 	while (it != this->_Operators.end())
 	{
-		(*it)->sendReply(":" + (*it)->getServer() + " 352 " + (*it)->getNickname() + ' ' + this->_name + ' ' + (*it)->getUsername() + ' ' + (*it)->getHostname() + ' ' + (*it)->getServer() + ' ' + (*it)->getNickname() + " @ :0 " + (*it)->getRealname());
+		user->sendReply(":" + user->getServer() + " 352 " + user->getNickname() + ' ' + this->_name + ' ' + (*it)->getUsername() + ' ' + (*it)->getHostname() + ' ' + (*it)->getServer() + ' ' + (*it)->getNickname() + " @ :0 " + (*it)->getRealname());
 		it++;
 	}
 	it = this->_Users.begin();
 	while (it != this->_Users.end())
 	{
-		(*it)->sendReply(":" + (*it)->getServer() + " 352 " + (*it)->getNickname() + ' ' + this->_name + ' ' + (*it)->getUsername() + ' ' + (*it)->getHostname() + ' ' + (*it)->getServer() + ' ' + (*it)->getNickname() + " H :0 " + (*it)->getRealname());
+		user->sendReply(":" + user->getServer() + " 352 " + user->getNickname() + ' ' + this->_name + ' ' + (*it)->getUsername() + ' ' + (*it)->getHostname() + ' ' + (*it)->getServer() + ' ' + (*it)->getNickname() + " H :0 " + (*it)->getRealname());
 		it++;
 	}
 }
