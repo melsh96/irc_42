@@ -6,7 +6,7 @@
 /*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 16:23:13 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/13 17:58:28 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/13 19:42:58 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -237,10 +237,14 @@ void	Server::_joinCmd(User *user, std::string param)
 			// join channel
 			std::string result = this->_channels[it->first]->joinChannel(it->second, user);
 			user->sendReply(result);
-			if (result == (':' + user->getNickname() + " JOIN " + it->first))
+			//if (result == (':' + user->getNickname() +  + " JOIN " + it->first))
+			if (result == (':' + user->getNickname() + "!" + user->getNickname() + "@localhost" + " JOIN " + it->first))
 			{
 				this->_channels[it->first]->sendMessage(user, result);
-				user->sendReply(":" + user->getServer() + " 332 " + user->getNickname() + ' ' + it->first + " :" + this->_channels[it->first]->getTopic());
+				if (this->_channels[it->first]->getTopic() != "")
+					user->sendReply(":" + user->getServer() + " 332 " + user->getNickname() + ' ' + it->first + " :" + this->_channels[it->first]->getTopic());
+				else
+					user->sendReply(RPL_NOTOPIC(user->getNickname(), user->getServer(), it->first));
 				this->_channels[it->first]->listUsersOnChannel(user);
 			}
 			return ;
@@ -250,7 +254,7 @@ void	Server::_joinCmd(User *user, std::string param)
 			// create channel
 			this->_channels[it->first] = new Channel(it->first, it->second, user);
 			user->sendReply(':' + user->getNickname() + " JOIN " + it->first);
-			user->sendReply(":" + user->getServer() + " 332 " + user->getNickname() + ' ' + it->first + " :" + this->_channels[it->first]->getTopic());
+			user->sendReply(RPL_NOTOPIC(user->getNickname(), user->getServer(), it->first));
 			this->_channels[it->first]->listUsersOnChannel(user);
 			return ;
 		}
@@ -370,6 +374,8 @@ void	Server::_modeCmd(User *user, std::string param)
 	std::string channel;
 	std::string modestring;
 	std::string argument;
+	
+	std::cout << rouge << "MODE :" << user->getNickname() << fin << std::endl;
 
 	channel = param.substr(0, param.find(' '));
 	if (param.find(' ') != std::string::npos)
@@ -454,6 +460,7 @@ void	Server::_topicCmd(User *user, std::string param)
 
 void	Server::_whoCmd(User *user, std::string param)
 {
+	std::cout << rouge << "WHO :" << user->getNickname() << fin << std::endl;
 	if (param[0] != '#')
 		return ; // ON GERE PAS, ON FAIT QUE LES CHANNELS
 	std::map<std::string, Channel*>::iterator it;

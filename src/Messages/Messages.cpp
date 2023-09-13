@@ -6,7 +6,7 @@
 /*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 10:57:59 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/13 16:50:37 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/13 19:30:47 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ std::string RPL_NAMREPLY(std::string nick, std::string server, std::string chann
 
 //"<client> <channel> :End of /NAMES list"
 std::string RPL_ENDOFNAMES(std::string nick, std::string server, std::string channel){
-	return (":" + server + " 366 " + nick + ' ' + channel + " :End of /NAMES list");
+	return (":" + server + " 366 " + nick + ' ' + channel + " :End of NAMES list");
 }
 
 //"<client> <nick> <channel>"

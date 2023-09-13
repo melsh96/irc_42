@@ -6,7 +6,7 @@
 /*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 17:28:51 by fbily             #+#    #+#             */
-/*   Updated: 2023/09/13 15:43:23 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/13 19:44:27 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ Channel::Channel(const Channel& obj)
 	(void)obj;
 }
 
-Channel::Channel(std::string name, std::string key, User *user) : _name(name), _topic(""), _key(key), _inviteMode(false), _topicMode(false),
+Channel::Channel(std::string name, std::string key, User *user) : _name(name), _topic(""), _key(key), _inviteMode(false), _topicMode(true),
 	_maxUsers(0), _nbUser(1), _topicTime(""), _topicUser("")
 {
 	time_t now = time(0);
@@ -127,7 +127,8 @@ std::string	Channel::joinChannel(std::string key, User *user)
 	{
 		this->_Users.push_back(user);
 		this->_nbUser++;
-		return (':' + user->getNickname() + " JOIN " + this->getName());
+		//return (':' + user->getNickname() + " JOIN " + this->getName());
+		return (':' + user->getNickname() + "!" + user->getNickname() + "@localhost" + " JOIN " + this->getName());
 	}
 	else
 		return (ERR_BADCHANNELKEY(user->getNickname(), this->getName()));//erreur de mot de passe 
@@ -219,13 +220,15 @@ void	Channel::listUsersOnChannel(User *user)
 	std::vector<User *>::iterator it = this->_Operators.begin();
 	while (it != this->_Operators.end())
 	{
-		result.append('@' + (*it)->getNickname() + ' ');
+		if (it != this->_Operators.begin())
+			result += ' ';
+		result.append('@' + (*it)->getNickname());
 		it++;
 	}
 	it = this->_Users.begin();
 	while (it != this->_Users.end())
 	{
-		result.append((*it)->getNickname() + ' ');
+		result.append(' ' + (*it)->getNickname());
 		it++;
 	}
 	user->sendReply(result);
