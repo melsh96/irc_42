@@ -6,7 +6,7 @@
 /*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 17:16:21 by fbily             #+#    #+#             */
-/*   Updated: 2023/09/13 12:51:05 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/14 15:15:30 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,9 @@ class Channel
 		std::string			_name;
 		std::string			_topic;
 		std::string			_key;
+		bool				_isKey;
 		bool				_inviteMode;
-		bool				_topicMode;//si c'est vrai seul les op peuvent le modifier
+		bool				_topicMode;
 		unsigned int		_maxUsers;
 		unsigned int		_nbUser;
 		std::vector<User *>	_Users;
@@ -75,8 +76,6 @@ class Channel
 		bool			hasDuplicates(const std::string& str);
 		void			kickModeUser(std::string target);
 		void			kickModeOperator(std::string target);
-		//ajouter avant a la liste les invites 
-		
 };
 
 #endif

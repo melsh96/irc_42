@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   User.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: meshahrv <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/03 18:45:15 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/14 12:42:47 by meshahrv         ###   ########.fr       */
+/*   Updated: 2023/09/14 14:48:22 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,13 +22,18 @@ User::User() {
 // une des erreurs etait lié aux variables non initialisées et essentiel pour la suite.
 User::User(int fd, struct sockaddr_storage *userAddr) : _password(false), _welcomed(false), _server("IRC") {
 
-	char hostname[256];
+	char hostname[NI_MAXHOST];
+	struct sockaddr_in * sa = reinterpret_cast<struct sockaddr_in *>(userAddr);
 
-	gethostname(hostname, sizeof(hostname));
+	int result = getnameinfo(reinterpret_cast<sockaddr *>(sa), sizeof(sockaddr_in), hostname, NI_MAXHOST, NULL, 0, 0);
+	if (result != 0)
+	{
+		std::cerr << rouge << "Error hostname" << fin << std::endl; // Meilleure gestion de l'erreur ?
+		this->_hostname = "unknow";
+	}
 	this->_hostname = hostname;
     this->_fd = fd;
     this->_userAddr = userAddr;
-    
 }
 
 User::~User() {

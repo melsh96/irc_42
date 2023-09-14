@@ -6,7 +6,7 @@
 /*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 17:28:51 by fbily             #+#    #+#             */
-/*   Updated: 2023/09/13 20:57:56 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/14 15:10:40 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ Channel::Channel(const Channel& obj)
 	(void)obj;
 }
 
-Channel::Channel(std::string name, std::string key, User *user) : _name(name), _topic(""), _key(key), _inviteMode(false), _topicMode(true),
+Channel::Channel(std::string name, std::string key, User *user) : _name(name), _topic(""), _key(key), _isKey(false), _inviteMode(false), _topicMode(true),
 	_maxUsers(0), _nbUser(1), _topicTime(""), _topicUser("")
 {
 	time_t now = time(0);
@@ -83,7 +83,7 @@ std::string Channel::getModestring() const
 		modestring.append("i");
 	if (this->_topicMode)
 		modestring.append("t");
-	if (this->_key != "")
+	if (this->_isKey == true)
 		modestring.append("k");
 	if (this->_maxUsers != 0)
 	{
@@ -122,12 +122,11 @@ std::string	Channel::joinChannel(std::string key, User *user)
 	if (this->_maxUsers != 0 && this->_nbUser >= this->_maxUsers)
 		return (ERR_CHANNELISFULL(user->getNickname(), this->getName()));//erreur plus de place
 	
-	if (key == this->_key)
+	if (this->_isKey == false || (this->_isKey == true && key == this->_key))
 	{
 		this->_Users.push_back(user);
 		this->_nbUser++;
-		//return (':' + user->getNickname() + " JOIN " + this->getName());
-		return (':' + user->getNickname() + "!" + user->getNickname() + "@localhost" + " JOIN " + this->getName());
+		return (':' + user->getNickname() + "!" + user->getNickname() + "@" + user->getHostname() + " JOIN " + this->getName());
 	}
 	else
 		return (ERR_BADCHANNELKEY(user->getNickname(), this->getName()));//erreur de mot de passe 
@@ -301,6 +300,7 @@ void	Channel::set_key(User *user, std::string argument, int pos_argument, int si
 {
 	if (sign == -1)
 	{
+		this->_isKey = false;
 		this->_key = "";
 		user->sendReply(":" + user->getNickname() + " MODE " + this->_name + " -k");
 		sendMessage(user, ":" + user->getNickname() + " MODE " + this->_name + " -k");
@@ -327,6 +327,7 @@ void	Channel::set_key(User *user, std::string argument, int pos_argument, int si
 	}
 	if (!argument.empty())
 	{
+		this->_key = true;
 		this->_key = arg_1;
 		user->sendReply(":" + user->getNickname() + " MODE " + this->_name + " +k");
 		sendMessage(user, ":" + user->getNickname() + " MODE " + this->_name + " +k");

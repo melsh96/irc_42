@@ -3,16 +3,11 @@ TODO :
 /rawlog OPEN ~/Desktop/GitHub/ft_irc/log_flo.txt
 
 / PART a implementer pour leave un channel ?
-/ nick!user@hostname >>> Recuperer le vrai hostname dans User.cpp/Server.cpp
-		-> changer les RPL / ERR avec le bon hostname
-/ probleme creation multiple channel (bug au dela de 2)
-/ multiple message IRSSI vers NC
+/ multiple message IRSSI vers NC >> Uniquement sur plusieurs poste et non en local ?
 / changer makefile
 / corriger leaks
 / virer user des channel apres deconnexion : QuitCmd ?
 / guest ne recoit pas invitation channel
 / changer message quand on tente de kick un op ? (actuellement : No such user)
 / gerer quand un client (nc) leave avec CTRL^C
-/ voir avec Perrine ; NICKCOLLISON ?
-/ JOIN 42,43,44 ok ==== received 42,43,44 ok,x,x
-		-> Voir si on met x par default ou x et "" pour no password
+/ Collision ? Changer message ? (433) // tester connection user avec nickname existant

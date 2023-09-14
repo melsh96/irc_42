@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerCmds.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: meshahrv <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 16:23:13 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/14 13:12:37 by meshahrv         ###   ########.fr       */
+/*   Updated: 2023/09/14 15:10:01 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,7 +144,7 @@ void    Server::_userCmd(User *user, std::string param)
 		return (user->sendReply(ERR_NEEDMOREPARAMS(user->getNickname(), param)));
 	user->setRealname(realname);
 	user->setUsername(mode);
-	user->setHostname(unused);
+	//user->setHostname(unused);
 	//std::cout << rouge << "Param usercmd : " << param << "\nHostname usercmd :"<< unused << fin << std::endl;
 	if (user->getNickname().size() && user->getPassword() && !user->hasBeenWelcomed())
 		user->welcome(this->_creationDate);
@@ -153,7 +153,7 @@ void    Server::_userCmd(User *user, std::string param)
 void    Server::_pingCmd(User *user, std::string param){
 	if (param.empty())
 		return (user->sendReply(ERR_NEEDMOREPARAMS(user->getNickname(), param)));
-	if (param != "localhost" && param != "IRC") // change localhost to _hostname variable
+	if (param != user->getHostname() && param != "IRC") // changed localhost to _hostname variable
 		return (user->sendReply(ERR_NOSUCHSERVER(user->getNickname(), param)));
 	user->sendReply(RPL_PONG(user->getNickname(), param));
 }
@@ -167,7 +167,7 @@ void	Server::_quitCmd(User *user, std::string param)
 	for (users_iterator it = _user.begin(); it != _user.end(); ++it)
 	{
 		if (it->second->getNickname() != user->getNickname())
-			it->second->sendReply(":" + user->getNickname() + "!d@" + "localhost" + " QUIT :Quit: " + param + ";\n" + user->getNickname() + " is exiting the network with the message: \"Quit: " + param + "\"");
+			it->second->sendReply(":" + user->getNickname() + "!" + user->getNickname() + "@" + user->getHostname() + " QUIT :Quit: " + param + ";\n" + user->getNickname() + " is exiting the network with the message: \"Quit: " + param + "\"");
 	}
 	try
 	{
@@ -198,7 +198,6 @@ void	Server::_joinCmd(User *user, std::string param)
 	std::map<std::string, std::string>	channel;
 	std::string chans;
 	std::string keys;
-	//std::cout << rouge << "Hostname :" << user->getHostname() << fin << std::endl;
 	if (param.empty())
 		return (user->sendReply(ERR_NEEDMOREPARAMS(user->getNickname(), param)));
 	if (param.find(' ') != std::string::npos)
@@ -237,7 +236,7 @@ void	Server::_joinCmd(User *user, std::string param)
 			// join channel
 			std::string result = this->_channels[it->first]->joinChannel(it->second, user);
 			user->sendReply(result);
-			if (result == (':' + user->getNickname() + "!" + user->getNickname() + "@localhost" + " JOIN " + it->first))
+			if (result == (':' + user->getNickname() + "!" + user->getNickname() + "@" + user->getHostname() + " JOIN " + it->first))
 			{
 				this->_channels[it->first]->sendMessage(user, result);
 				if (this->_channels[it->first]->getTopic() != "")
@@ -251,7 +250,7 @@ void	Server::_joinCmd(User *user, std::string param)
 		{
 			// create channel
 			this->_channels[it->first] = new Channel(it->first, it->second, user);
-			user->sendReply(':' + user->getNickname() + " JOIN " + it->first);
+			user->sendReply(':' + user->getNickname() + "!" + user->getNickname() + "@" + user->getHostname() + " JOIN " + it->first);
 			user->sendReply(RPL_NOTOPIC(user->getNickname(), user->getServer(), it->first));
 			this->_channels[it->first]->listUsersOnChannel(user);
 		}
