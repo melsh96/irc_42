@@ -6,7 +6,7 @@
 /*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 17:16:21 by fbily             #+#    #+#             */
-/*   Updated: 2023/09/14 15:15:30 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/14 18:29:18 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ class Channel
 		std::string 	getTopic() const;
 		bool			getModeTopic() const;
 		unsigned int	getMaxUsers() const;
+		unsigned int	getNbUser() const;
 		std::string		getTopicDate() const;
 		std::string		getTopicUser() const;
 		std::string		getCreationDate() const;
@@ -61,6 +62,7 @@ class Channel
 		void			set_op(User *user, std::string argument, int pos_argument, int sign);
 		void			set_maxUsers(User *user, std::string argument, int pos_argument, int sign);
 		void			setTopic(User *user, std::string newTopic);
+		void			setNbUser(int nb);
 		
 		std::string		joinChannel(std::string key, User *user);
 		void			kickUser(User *user, std::string target, std::string comment);
@@ -76,6 +78,7 @@ class Channel
 		bool			hasDuplicates(const std::string& str);
 		void			kickModeUser(std::string target);
 		void			kickModeOperator(std::string target);
+		void			kickModeInvited(std::string target);
 };
 
 #endif

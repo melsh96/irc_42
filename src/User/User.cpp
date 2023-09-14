@@ -6,7 +6,7 @@
 /*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/03 18:45:15 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/14 14:48:22 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/14 16:29:27 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ User::User(int fd, struct sockaddr_storage *userAddr) : _password(false), _welco
 	int result = getnameinfo(reinterpret_cast<sockaddr *>(sa), sizeof(sockaddr_in), hostname, NI_MAXHOST, NULL, 0, 0);
 	if (result != 0)
 	{
-		std::cerr << rouge << "Error hostname" << fin << std::endl; // Meilleure gestion de l'erreur ?
+		std::cerr << rouge << "Error hostname" << fin << std::endl;
 		this->_hostname = "unknow";
 	}
 	this->_hostname = hostname;

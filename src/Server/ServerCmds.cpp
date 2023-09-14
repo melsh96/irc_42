@@ -6,7 +6,7 @@
 /*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 16:23:13 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/14 15:10:01 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/14 19:10:11 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,7 +122,6 @@ void    Server::_nickCmd(User *user, std::string param)
 	}
 	std::string oldname =user->getNickname();
 	user->setNickname(param);
-	//return (user->sendReply(":" + oldname + "!" + user->getUsername() + "@localhost" + " NICK " + param));
 	return (user->sendReply(":" + oldname + " NICK " + param));
 }
 
@@ -144,8 +143,6 @@ void    Server::_userCmd(User *user, std::string param)
 		return (user->sendReply(ERR_NEEDMOREPARAMS(user->getNickname(), param)));
 	user->setRealname(realname);
 	user->setUsername(mode);
-	//user->setHostname(unused);
-	//std::cout << rouge << "Param usercmd : " << param << "\nHostname usercmd :"<< unused << fin << std::endl;
 	if (user->getNickname().size() && user->getPassword() && !user->hasBeenWelcomed())
 		user->welcome(this->_creationDate);
 }
@@ -169,6 +166,7 @@ void	Server::_quitCmd(User *user, std::string param)
 		if (it->second->getNickname() != user->getNickname())
 			it->second->sendReply(":" + user->getNickname() + "!" + user->getNickname() + "@" + user->getHostname() + " QUIT :Quit: " + param + ";\n" + user->getNickname() + " is exiting the network with the message: \"Quit: " + param + "\"");
 	}
+	_leaveChannels(user);
 	try
 	{
 		int	fd = user->getUserFd();
@@ -278,7 +276,7 @@ void	Server::_inviteCmd(User *user, std::string param)
 			break;
 	}
 	if (it == this->_user.end())
-		return(user->sendReply(ERR_NOSUCHNICK(user->getNickname(), guest)));
+		return (user->sendReply(ERR_NOSUCHNICK(user->getNickname(), guest)));
 	if (this->_channels.find(chans) != this->_channels.end())
 	{
 		//  channel finded
@@ -290,7 +288,9 @@ void	Server::_inviteCmd(User *user, std::string param)
 			return (user->sendReply(ERR_USERONCHANNEL(user->getNickname(), this->_channels[chans]->getName(), it->second->getNickname())));//verifier que j'ai envoyer les bon parametre, le guest ici est deja inscrit dans le channel 
 		if (this->_channels[chans]->foundInvited(it->second->getNickname()) == false)
 			this->_channels[chans]->addGuest(it->second);
-		//c'est lorsque le Guest essaiera de join qu'on verifiera si le channel est full ou non 
+		//c'est lorsque le Guest essaiera de join qu'on verifiera si le channel est full ou non
+		User * Guest = this->_findUser(guest);
+		Guest->sendReply(":" + user->getNickname() + "!d@" + user->getHostname() + " INVITE " + guest + ' ' + chans);
 		return (user->sendReply(RPL_INVITING(user->getNickname(), user->getServer(), this->_channels[chans]->getName(), it->second->getNickname())));//je suis pas sur des argument envoyer 
 	}
 	else
@@ -318,7 +318,8 @@ void	Server::_privmsgCmd(User *user, std::string param)
 		{
 			return(user->sendReply(ERR_NOSUCHNICK(user->getNickname(), target)));
 		}
-		return (it->second->sendReply((":" + user->getNickname() + " PRIVMSG " + target + " " + text)));
+		return (it->second->sendReply(':' + user->getNickname() + "!" + user->getNickname() + "@" + user->getHostname() + " PRIVMSG " + target + " " + text));
+		//return (it->second->sendReply((":" + user->getNickname() + " PRIVMSG " + target + " " + text)));
 	}
 	else
 	{
@@ -331,7 +332,8 @@ void	Server::_privmsgCmd(User *user, std::string param)
 		if (it == this->_channels.end())
 			return(user->sendReply(ERR_NOSUCHCHANNEL(user->getNickname(), target)));
 		if (it->second->foundUser(user->getNickname()) == true || it->second->foundOperator(user->getNickname()) == true)
-			return (it->second->sendMessage(user, (":" + user->getNickname() + " PRIVMSG " + target + " " + text)));
+			return (it->second->sendMessage(user, (':' + user->getNickname() + "!" + user->getNickname() + "@" + user->getHostname() + " PRIVMSG " + target + " " + text)));
+			//return (it->second->sendMessage(user, (":" + user->getNickname() + " PRIVMSG " + target + " " + text)));
 		else
 			return (user->sendReply(ERR_CANNOTSENDTOCHAN(user->getNickname(), it->first)));
 	}

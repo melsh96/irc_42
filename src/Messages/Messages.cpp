@@ -6,7 +6,7 @@
 /*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 10:57:59 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/13 19:30:47 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/14 18:57:11 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,7 @@ std::string ERR_NONICKNAMEGIVEN(std::string nick) {
 
 //"<client> <nick> :Nickname collision KILL from <user>@<host>"
 std::string ERR_NICKCOLLISION(std::string nick) {
-	return "436 " + nick + " :Nickname collision";
+	return "436 " + nick + " :Nickname is already used";
 }
 
 //"<client> :You may not reregister"

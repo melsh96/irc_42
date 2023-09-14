@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: meshahrv <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/03 14:10:46 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/14 12:50:40 by meshahrv         ###   ########.fr       */
+/*   Updated: 2023/09/14 18:53:07 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,6 +112,7 @@ void Server::_createServer(void)
 	std::cout << GREEN("### Success ### ") << GREY("...listen()") << std::endl;
 
 	this->_listenSocket = socketFd;
+	freeaddrinfo(result);
 }
 
 void Server::_runServer()
@@ -234,7 +235,6 @@ void Server::_receiveData(pollfd_it &it)
 
 int Server::_getData(User *user)
 {
-
 	int nbyte = 0;
 	int fd = user->getUserFd();
 	char buffer[1024];
@@ -249,11 +249,9 @@ int Server::_getData(User *user)
 			break;
 		str.append(buffer);
 	} 
-
 	std::cout << GREEN("### Success ### ") << GREY("...recv()") << std::endl;
 	std::cout << YELLOW("[ MESSAGE RECEIVED : ") << bluberry + user->getNickname()+ " => " << str + fin << YELLOW("]") << std::endl << std::endl;
-	user->setMessage(str); // did not set the message in the user
-
+	user->setMessage(str);
 	return (nbyte);
 }
 
@@ -267,4 +265,47 @@ std::string Server::_timestamp()
 	strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
 	
 	return (buf);
+}
+
+User *	Server::_findUser(std::string nick)
+{
+	User *	tmp;
+	std::map<int, User *>::iterator	it = this->_user.begin();
+	tmp = it->second;
+	while (it != this->_user.end())
+	{
+		if (it->second->getNickname() == nick)
+			return (it->second);
+		it++;
+	}
+	return (tmp);
+}
+
+void	Server::_leaveChannels(User *user)
+{
+	std::map<std::string, Channel *>::iterator it = this->_channels.begin();
+	while (it != this->_channels.end())
+	{
+		if (it->second->foundOperator(user->getNickname()) == true)
+		{
+			it->second->kickModeOperator(user->getNickname());
+			it->second->setNbUser(-1);
+		}
+		if (it->second->foundUser(user->getNickname()) == true)
+		{
+			it->second->kickModeUser(user->getNickname());
+			it->second->setNbUser(-1);
+		}
+		if (it->second->foundInvited(user->getNickname()) == true)
+			it->second->kickModeInvited(user->getNickname());
+		if (it->second->getNbUser() <= 0)
+		{
+			std::map<std::string, Channel *>::iterator tmp = it;
+			it++;
+			delete this->_channels[tmp->first];
+			this->_channels.erase(tmp);
+		}
+		else
+			it++;
+	}
 }

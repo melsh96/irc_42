@@ -2,12 +2,11 @@ TODO :
 
 /rawlog OPEN ~/Desktop/GitHub/ft_irc/log_flo.txt
 
-/ PART a implementer pour leave un channel ?
-/ multiple message IRSSI vers NC >> Uniquement sur plusieurs poste et non en local ?
 / changer makefile
-/ corriger leaks
-/ virer user des channel apres deconnexion : QuitCmd ?
-/ guest ne recoit pas invitation channel
+
 / changer message quand on tente de kick un op ? (actuellement : No such user)
-/ gerer quand un client (nc) leave avec CTRL^C
 / Collision ? Changer message ? (433) // tester connection user avec nickname existant
+
+/ PART a implementer pour leave un channel ?
+/ gerer quand un client (nc) leave avec CTRL^C
+/ multiple message IRSSI vers NC >> Uniquement sur plusieurs poste et non en local ?

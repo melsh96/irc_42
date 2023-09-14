@@ -6,7 +6,7 @@
 /*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 17:28:51 by fbily             #+#    #+#             */
-/*   Updated: 2023/09/14 15:10:40 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/14 18:34:37 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,6 +95,16 @@ std::string Channel::getModestring() const
 	if (modestring == "+")
 		modestring.clear();
 	return (modestring);
+}
+
+unsigned int Channel::getNbUser() const
+{
+	return (this->_nbUser);
+}
+
+void Channel::setNbUser(int nb)
+{
+	this->_nbUser += nb;
 }
 
 void Channel::setTopic(User *user, std::string newTopic)
@@ -327,6 +337,8 @@ void	Channel::set_key(User *user, std::string argument, int pos_argument, int si
 	}
 	if (!argument.empty())
 	{
+		if (arg_1 == "x")
+			return (user->sendReply(":" + user->getServer() + " 525 " + user->getNickname() + ' ' + this->_name + " :Key is not well-formed (x is not a valid key)"));
 		this->_key = true;
 		this->_key = arg_1;
 		user->sendReply(":" + user->getNickname() + " MODE " + this->_name + " +k");
@@ -356,6 +368,20 @@ void	Channel::kickModeUser(std::string target)
 		if ((*it)->getNickname() == target)
 		{
 			this->_Users.erase(it);
+			break ;
+		}
+		it++;
+	}
+}
+
+void	Channel::kickModeInvited(std::string target)
+{
+	std::vector<User *>::iterator	it = this->_Invited.begin();
+	while (it != this->_Invited.end())
+	{
+		if ((*it)->getNickname() == target)
+		{
+			this->_Invited.erase(it);
 			break ;
 		}
 		it++;

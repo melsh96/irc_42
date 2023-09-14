@@ -6,7 +6,7 @@
 /*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/03 14:10:07 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/13 15:07:00 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/14 18:24:56 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,10 +79,11 @@ class Server {
 		void							_topicCmd(User *user, std::string param);
 		void							_whoCmd(User *user, std::string param);
 
+		User *							_findUser(std::string nick);
+		void							_leaveChannels(User *user);
 		void							_clean();
 		std::string						_timestamp();
 
-		
 	public:
 		Server();
 		Server(std::string port, std::string password);
