@@ -14,3 +14,5 @@ TODO :
 / changer message quand on tente de kick un op ? (actuellement : No such user)
 / gerer quand un client (nc) leave avec CTRL^C
 / voir avec Perrine ; NICKCOLLISON ?
+/ JOIN 42,43,44 ok ==== received 42,43,44 ok,x,x
+		-> Voir si on met x par default ou x et "" pour no password

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerCmds.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
+/*   By: meshahrv <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 16:23:13 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/13 20:56:26 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/14 13:12:37 by meshahrv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -212,7 +212,7 @@ void	Server::_joinCmd(User *user, std::string param)
 	size_t pos2 = 0;
 	while (!chans.empty())
 	{
-		if ((pos1 = chans.find(',')) != std::string::npos)
+		while ((pos1 = chans.find(',')) != std::string::npos)
 		{
 			std::string token1 = chans.substr(0, pos1);
 			if ((pos2 = keys.find(',')) != std::string::npos)
@@ -246,7 +246,6 @@ void	Server::_joinCmd(User *user, std::string param)
 					user->sendReply(RPL_NOTOPIC(user->getNickname(), user->getServer(), it->first));
 				this->_channels[it->first]->listUsersOnChannel(user);
 			}
-			return ;
 		}
 		else
 		{
@@ -255,7 +254,6 @@ void	Server::_joinCmd(User *user, std::string param)
 			user->sendReply(':' + user->getNickname() + " JOIN " + it->first);
 			user->sendReply(RPL_NOTOPIC(user->getNickname(), user->getServer(), it->first));
 			this->_channels[it->first]->listUsersOnChannel(user);
-			return ;
 		}
 		it++;
 	}

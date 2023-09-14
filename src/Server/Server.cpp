@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
+/*   By: meshahrv <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/03 14:10:46 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/13 15:44:04 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/14 12:50:40 by meshahrv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -251,7 +251,7 @@ int Server::_getData(User *user)
 	} 
 
 	std::cout << GREEN("### Success ### ") << GREY("...recv()") << std::endl;
-	std::cout << YELLOW("[ MESSAGE RECEIVED : ") << str << YELLOW("]") << std::endl << std::endl;
+	std::cout << YELLOW("[ MESSAGE RECEIVED : ") << bluberry + user->getNickname()+ " => " << str + fin << YELLOW("]") << std::endl << std::endl;
 	user->setMessage(str); // did not set the message in the user
 
 	return (nbyte);

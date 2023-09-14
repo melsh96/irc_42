@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   User.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
+/*   By: meshahrv <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/03 18:45:15 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/13 20:36:02 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/14 12:42:47 by meshahrv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,6 @@ bool	User::hasBeenWelcomed() const{
 	return (_welcomed);
 }
 
-
 void	User::clearMessage(){
 	_message.clear();
 }
@@ -118,13 +117,13 @@ void	User::sendReply(std::string reply)
 	size_t	nbytes = reply.length();
 	int		n;
 
+	std::cout << lila << (getNickname() + " SEND =>" + reply) << fin << std::endl;
 	while (total < nbytes)
 	{
 		n = send(_fd, &(reply[total]), nbytes - total, 0);
 		if (n == -1) break;
 		total += n;
 	}
-
 	if (n == -1)
 	{
 		std::cerr << "Error User::sendReply" << std::endl;
