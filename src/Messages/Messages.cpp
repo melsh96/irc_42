@@ -6,7 +6,7 @@
 /*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 10:57:59 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/14 18:57:11 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/14 20:43:54 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,6 +157,11 @@ std::string ERR_NOSUCHNICK(std::string nick, std::string user)
 	return ("401 " + nick + " " + user + " :No such nick/channel");
 }
 
+//"<client> <command>{ <subcommand>} :<info>"
+std::string	ERR_UNKNOWNERROR(std::string nick, std::string server, std::string hostname, std::string cmd, std::string comment)
+{
+	return (":" + server + " 400 " + nick + "!" + nick + "@" + hostname + ' ' + cmd + " :" + comment);
+}
 //"<client> <channel> :Cannot send to channel"
 std::string	ERR_CANNOTSENDTOCHAN(std::string nick, std::string channel)
 {

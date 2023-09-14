@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Messages.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 10:58:08 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/12 17:01:47 by zhamdouc         ###   ########.fr       */
+/*   Updated: 2023/09/14 20:45:32 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,5 +48,6 @@ std::string ERR_UNKNOWNMODE(std::string nick, std::string modechar);
 std::string ERR_NOSUCHNICK(std::string nick, std::string user);
 std::string	ERR_CANNOTSENDTOCHAN(std::string nick, std::string channel);
 std::string ERR_NOTEXTTOSEND(std::string nick);
+std::string	ERR_UNKNOWNERROR(std::string nick, std::string server, std::string hostname, std::string cmd, std::string comment);
 
 #endif

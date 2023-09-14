@@ -6,7 +6,7 @@
 /*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/03 14:10:46 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/14 18:53:07 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/14 20:21:51 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -222,6 +222,7 @@ void Server::_receiveData(pollfd_it &it)
 				std::cerr << RED("Error: ") << "socket hung up" << std::endl;
 			else
 				std::cerr << RED("Error: ") << "recv()" << std::endl;
+			_leaveChannels(user);
 			this->_deleteUser(it);
 		}
 		else

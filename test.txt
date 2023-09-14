@@ -1,12 +1,3 @@
 TODO :
 
-/rawlog OPEN ~/Desktop/GitHub/ft_irc/log_flo.txt
-
-/ changer makefile
-
-/ changer message quand on tente de kick un op ? (actuellement : No such user)
-/ Collision ? Changer message ? (433) // tester connection user avec nickname existant
-
-/ PART a implementer pour leave un channel ?
-/ gerer quand un client (nc) leave avec CTRL^C
-/ multiple message IRSSI vers NC >> Uniquement sur plusieurs poste et non en local ?
+/PUSH

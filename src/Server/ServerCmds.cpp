@@ -6,7 +6,7 @@
 /*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 16:23:13 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/14 19:10:11 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/14 20:47:27 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -351,9 +351,10 @@ void	Server::_kickCmd(User *user, std::string param)
 	target.erase(target.find(' '), comment.length() + 1);
 	if (comment.length() == 1)	
 		comment = "kicked for no reason, sorry bro.";
-	std::cout << rouge << channel << '\n' << target << '\n' << comment << '\n' << fin;
 	if (this->_channels.find(channel) == this->_channels.end())
 		return (user->sendReply(ERR_NOSUCHCHANNEL(user->getNickname(), channel)));
+	if (this->_channels[channel]->foundOperator(target) == true)
+		return (user->sendReply(ERR_UNKNOWNERROR(user->getNickname(), user->getServer(), user->getHostname(), "KICK", "Can't kick an operator.")));
 	if (this->_channels[channel]->foundUser(target) == false)
 		return (user->sendReply(ERR_USERNOTINCHANNEL(user->getNickname(), channel, target)));
 	if (this->_channels[channel]->foundOperator(user->getNickname()) == false)
