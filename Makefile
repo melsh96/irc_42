@@ -6,7 +6,7 @@
 #    By: fbily <fbily@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/07/03 13:32:10 by meshahrv          #+#    #+#              #
-#    Updated: 2023/09/14 21:05:01 by fbily            ###   ########.fr        #
+#    Updated: 2023/09/15 12:20:46 by fbily            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,6 +14,7 @@
 
 GREEN = "\033[38;5;150m"
 LILA = "\033[38;5;140m"
+BLUE = "\033[1;36m"
 BOLD = "\033[1m"
 NC = "\033[0m"
 
@@ -47,21 +48,23 @@ INC = -I$(INC_DIR)
 all: $(NAME)
 
 $(NAME): $(OBJ)
-	make --no-print-directory header
 	@$(CC) $(CFLAGS) $(CPPFLAGS) $(OBJ) -o $(NAME)
-	@echo ${LILA}Compiling ${NAME}${NC} [${GREEN}OK${NC}]
+	@echo ${LILA}${BOLD}Compiling ${NAME}${NC} [${GREEN}OK${NC}]
 
 $(OBJ_DIR)%.o: $(SRC_DIR)%.cpp
+	make --no-print-directory header
 	@mkdir -p $(@D)
 	@$(CC) $(CFLAGS) $(CPPFLAGS) $(INC) -o $@ -c $<
+	@echo ${BLUE}${BOLD}Building $< ${NC}
 
 $(OBJ_DIR)$(SRC_DIR)%.o: $(SRC_DIR)%.cpp
 	@mkdir -p $(@D)
 	@$(CC) $(CFLAGS) $(CPPFLAGS) $(INC) -o $@ -c $<
+	@echo ${BLUE}${BOLD}Building $< ${NC}
 
 clean:
 	@rm -rf $(OBJ_DIR)
-	@echo ${LILA}${BOLD}CUB3D${NC} [${GREEN}OK${NC}] Cleaning Objects : ${BOLD}${NAME}${NC}
+	@echo ${LILA}${BOLD}${NAME}${NC} [${GREEN}OK${NC}] Cleaning Objects : ${BOLD}${NAME}${NC}
 
 fclean: clean
 	@rm -f $(NAME)

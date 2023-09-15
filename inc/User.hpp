@@ -6,7 +6,7 @@
 /*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/03 18:51:42 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/14 14:48:55 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/15 13:25:34 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,6 @@ class User {
 		void                        welcome(std::string date);
 		bool                        hasBeenWelcomed(void) const;
 
-		//std::string                 timestamp();
 		void						clearMessage(void);
 };
 

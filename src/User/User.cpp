@@ -6,20 +6,15 @@
 /*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/03 18:45:15 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/14 16:29:27 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/15 13:31:32 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/User.hpp"
-#include <unistd.h>
 
 User::User() {
-
-	// std::cout << GREEN("Default Constructor") << std::endl;
-
 }
 
-// une des erreurs etait lié aux variables non initialisées et essentiel pour la suite.
 User::User(int fd, struct sockaddr_storage *userAddr) : _password(false), _welcomed(false), _server("IRC") {
 
 	char hostname[NI_MAXHOST];
@@ -37,8 +32,6 @@ User::User(int fd, struct sockaddr_storage *userAddr) : _password(false), _welco
 }
 
 User::~User() {
-	
-	// std::cout << RED("Default Destructor") << std::endl;
 }
 
 int User::getUserFd() {
@@ -134,15 +127,3 @@ void	User::sendReply(std::string reply)
 		std::cerr << "Error User::sendReply" << std::endl;
 	}
 }
-
-// std::string User::timestamp()
-// {
-// 	time_t now = time(0);
-// 	struct tm tstruct;
-// 	char buf[80];
-
-// 	tstruct = *localtime(&now);
-// 	strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
-	
-// 	return (buf);
-// }

@@ -6,7 +6,7 @@
 /*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 16:23:13 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/14 20:47:27 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/15 13:29:27 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ void Server::_indexingCmd()
 	_indexCmd.insert(std::pair<std::string, func>("MODE", &Server::_modeCmd));
 	_indexCmd.insert(std::pair<std::string, func>("TOPIC", &Server::_topicCmd));
 	_indexCmd.insert(std::pair<std::string, func>("WHO", &Server::_whoCmd));
+	_indexCmd.insert(std::pair<std::string, func>("NOTICE", &Server::_noticeCmd));
 }
 
 void Server::_parseCmd(User *user)
@@ -55,8 +56,6 @@ void Server::_parseCmd(User *user)
 					buf.clear();
 				if (!buf.empty())
 					buf = buf.substr(0, buf.find_last_not_of(' ') + 1);
-				std::cout << "Command: <" << cmd << ">" << std::endl;
-				std::cout << "Buffer: <" << buf << ">" << std::endl;
 				if (cmd != "CAP" && cmd != "PASS" && !user->getPassword())
 				{
 					_closeConnection(user);
@@ -111,8 +110,6 @@ void    Server::_nickCmd(User *user, std::string param)
 {
 	if (param.empty())
 		return (user->sendReply(ERR_NONICKNAMEGIVEN(param)));
-	// if (!valid_user_name(param))
-	// 	return (user->sendReply(ERR_NONICKNAMEGIVEN(param)));
 	if (param.find(' ') != std::string::npos)
 		param = param.substr(0, param.find_first_of(' '));
 	for (users_iterator it = _user.begin(); it != _user.end(); ++it)
@@ -150,21 +147,21 @@ void    Server::_userCmd(User *user, std::string param)
 void    Server::_pingCmd(User *user, std::string param){
 	if (param.empty())
 		return (user->sendReply(ERR_NEEDMOREPARAMS(user->getNickname(), param)));
-	if (param != user->getHostname() && param != "IRC") // changed localhost to _hostname variable
+	if (param != user->getHostname() && param != "IRC")
 		return (user->sendReply(ERR_NOSUCHSERVER(user->getNickname(), param)));
 	user->sendReply(RPL_PONG(user->getNickname(), param));
 }
 
-//added this function to quit the server when the user types /exit
 void	Server::_quitCmd(User *user, std::string param)
 {
-	if (param.empty())
+	if (param == ":leaving")
 		param = "No reason given by user";
-	
+	else
+		param = param.substr(1);
 	for (users_iterator it = _user.begin(); it != _user.end(); ++it)
 	{
 		if (it->second->getNickname() != user->getNickname())
-			it->second->sendReply(":" + user->getNickname() + "!" + user->getNickname() + "@" + user->getHostname() + " QUIT :Quit: " + param + ";\n" + user->getNickname() + " is exiting the network with the message: \"Quit: " + param + "\"");
+			it->second->sendReply(":" + user->getNickname() + "!" + user->getNickname() + "@" + user->getHostname() + " QUIT :" + param + ";\n" + user->getNickname() + " is exiting the network with the message: \""+ param + "\"");
 	}
 	_leaveChannels(user);
 	try
@@ -267,8 +264,7 @@ void	Server::_inviteCmd(User *user, std::string param)
 		chans = param.substr(param.find(' ') + 1);
 	}
 	else
-		return (user->sendReply(ERR_NEEDMOREPARAMS(user->getNickname(), param)));//verifier si j'envoie les bon argument (est ce qu'il faut renvoyer Param)
-	// verifier que guest existe, et recuperer le pointeur pour pouvoir add
+		return (user->sendReply(ERR_NEEDMOREPARAMS(user->getNickname(), param)));
 	std::map<int, User *>::iterator it;
 	for(it = this->_user.begin(); it != this->_user.end(); it++)
 	{
@@ -279,22 +275,20 @@ void	Server::_inviteCmd(User *user, std::string param)
 		return (user->sendReply(ERR_NOSUCHNICK(user->getNickname(), guest)));
 	if (this->_channels.find(chans) != this->_channels.end())
 	{
-		//  channel finded
 		if (this->_channels[chans]->foundUser(user->getNickname()) == true)
-			return (user->sendReply(ERR_CHANOPRIVSNEEDED(user->getNickname(), this->_channels[chans]->getName())));//celui qui invite ne doit pas etre un user mais un operateur
+			return (user->sendReply(ERR_CHANOPRIVSNEEDED(user->getNickname(), this->_channels[chans]->getName())));
 		else if (this->_channels[chans]->foundOperator(user->getNickname()) == false)
-			return (user->sendReply(ERR_NOTONCHANNEL(user->getNickname(), this->_channels[chans]->getName())));//doit etre dans le channel 
+			return (user->sendReply(ERR_NOTONCHANNEL(user->getNickname(), this->_channels[chans]->getName())));
 		if (this->_channels[chans]->foundUser(it->second->getNickname()) == true || this->_channels[chans]->foundOperator(it->second->getNickname()) == true)
-			return (user->sendReply(ERR_USERONCHANNEL(user->getNickname(), this->_channels[chans]->getName(), it->second->getNickname())));//verifier que j'ai envoyer les bon parametre, le guest ici est deja inscrit dans le channel 
+			return (user->sendReply(ERR_USERONCHANNEL(user->getNickname(), this->_channels[chans]->getName(), it->second->getNickname())));
 		if (this->_channels[chans]->foundInvited(it->second->getNickname()) == false)
 			this->_channels[chans]->addGuest(it->second);
-		//c'est lorsque le Guest essaiera de join qu'on verifiera si le channel est full ou non
 		User * Guest = this->_findUser(guest);
 		Guest->sendReply(":" + user->getNickname() + "!d@" + user->getHostname() + " INVITE " + guest + ' ' + chans);
-		return (user->sendReply(RPL_INVITING(user->getNickname(), user->getServer(), this->_channels[chans]->getName(), it->second->getNickname())));//je suis pas sur des argument envoyer 
+		return (user->sendReply(RPL_INVITING(user->getNickname(), user->getServer(), this->_channels[chans]->getName(), it->second->getNickname())));
 	}
 	else
-		return (user->sendReply(ERR_NOSUCHCHANNEL(user->getNickname(), chans)));// channel non trouver
+		return (user->sendReply(ERR_NOSUCHCHANNEL(user->getNickname(), chans)));
 }
 
 void	Server::_privmsgCmd(User *user, std::string param)
@@ -319,7 +313,6 @@ void	Server::_privmsgCmd(User *user, std::string param)
 			return(user->sendReply(ERR_NOSUCHNICK(user->getNickname(), target)));
 		}
 		return (it->second->sendReply(':' + user->getNickname() + "!" + user->getNickname() + "@" + user->getHostname() + " PRIVMSG " + target + " " + text));
-		//return (it->second->sendReply((":" + user->getNickname() + " PRIVMSG " + target + " " + text)));
 	}
 	else
 	{
@@ -333,7 +326,6 @@ void	Server::_privmsgCmd(User *user, std::string param)
 			return(user->sendReply(ERR_NOSUCHCHANNEL(user->getNickname(), target)));
 		if (it->second->foundUser(user->getNickname()) == true || it->second->foundOperator(user->getNickname()) == true)
 			return (it->second->sendMessage(user, (':' + user->getNickname() + "!" + user->getNickname() + "@" + user->getHostname() + " PRIVMSG " + target + " " + text)));
-			//return (it->second->sendMessage(user, (":" + user->getNickname() + " PRIVMSG " + target + " " + text)));
 		else
 			return (user->sendReply(ERR_CANNOTSENDTOCHAN(user->getNickname(), it->first)));
 	}
@@ -364,12 +356,6 @@ void	Server::_kickCmd(User *user, std::string param)
 
 void	Server::_modeCmd(User *user, std::string param)
 {
-	/* MODE - Changer le mode du channel :
-		— i : Définir/supprimer le canal sur invitation uniquement (pas besoin d'argument)
-		— t : Définir/supprimer les restrictions de la commande TOPIC pour les opérateurs de canaux (pas besoin d'argument)
-		— k : Définir/supprimer la clé du canal (mot de passe) (pas besoin d'argument)
-		()— o : Donner/retirer le privilège de l’opérateur de canal (besoin d'un argument)
-		()— l : Définir/supprimer la limite d’utilisateurs pour le canal ()*/
 	std::string channel;
 	std::string modestring;
 	std::string argument;
@@ -385,9 +371,9 @@ void	Server::_modeCmd(User *user, std::string param)
 	if (channel[0] == '#')
 	{
 		if (this->_channels.find(channel) == this->_channels.end())
-			return (user->sendReply(ERR_NOSUCHCHANNEL(user->getNickname(), channel)));//verifier si c'est le bon message
+			return (user->sendReply(ERR_NOSUCHCHANNEL(user->getNickname(), channel)));
 		if(this->_channels[channel]->foundUser(user->getNickname()) == false && this->_channels[channel]->foundOperator(user->getNickname()) == false)
-			return (user->sendReply(ERR_NOTONCHANNEL(user->getNickname(), channel)));//message d'erreur il n'est pas dans le channel 
+			return (user->sendReply(ERR_NOTONCHANNEL(user->getNickname(), channel)));
 		if (argument.empty() && modestring.empty())
 		{
 			user->sendReply(RPL_CHANNELMODEIS(user->getServer(), user->getNickname(), channel, this->_channels[channel]->getModestring()));
@@ -397,18 +383,17 @@ void	Server::_modeCmd(User *user, std::string param)
 			return (user->sendReply(":" + user->getServer() + " 368 " + user->getNickname() + ' ' + channel + " :End of channel ban list"));
 		size_t pos = modestring.find_first_not_of("+-itkol");
 		if (pos != std::string::npos)
-			return (user->sendReply(ERR_UNKNOWNMODE(user->getNickname(), modestring.substr(pos, 1))));// on m'envoie un mauvais modestring
+			return (user->sendReply(ERR_UNKNOWNMODE(user->getNickname(), modestring.substr(pos, 1))));
 		if (this->_channels[channel]->foundOperator(user->getNickname()) == false)
-			return (user->sendReply(ERR_CHANOPRIVSNEEDED(user->getNickname(), channel)));//seul un operator peut changer les modes, je le fais que mtn car il me semble qu'un User peut lancer la commande Mode sans rien
+			return (user->sendReply(ERR_CHANOPRIVSNEEDED(user->getNickname(), channel)));
 		this->_channels[channel]->modeChannel(user, modestring, argument);
 		user->sendReply(RPL_CHANNELMODEIS(user->getServer(), user->getNickname(), channel, this->_channels[channel]->getModestring()));
 		this->_channels[channel]->sendMessage(user, RPL_CHANNELMODEIS(user->getServer(), user->getNickname(), channel, this->_channels[channel]->getModestring()));
-		this->_channels[channel]->sendMessage(user, RPL_CREATIONTIME(user->getServer(), user->getNickname(), channel, this->_channels[channel]->getCreationDate())); // Ici on envoie les modifs a tout les user.
+		this->_channels[channel]->sendMessage(user, RPL_CREATIONTIME(user->getServer(), user->getNickname(), channel, this->_channels[channel]->getCreationDate()));
 		return (user->sendReply(RPL_CREATIONTIME(user->getServer(), user->getNickname(), channel, this->_channels[channel]->getCreationDate())));
 	}
 	else
 		return ;
-		//return (user->sendReply(ERR_NOSUCHCHANNEL(user->getNickname(), channel)));// On garde ou pas ? Comment on fait pour gerer le Mode +i suite a la connection d'user ?
 }
 
 void	Server::_topicCmd(User *user, std::string param)
@@ -420,24 +405,23 @@ void	Server::_topicCmd(User *user, std::string param)
 	pos = param.find(' ');
 	channel = param.substr(0, param.find(' '));
 	if(pos != std::string::npos)
-		topic = param.substr(param.find(' ') + 2); // + 2 pour retirer le ':'
+		topic = param.substr(param.find(' ') + 2);
 	if (this->_channels.find(channel) == this->_channels.end())
-			return (user->sendReply(ERR_NOSUCHCHANNEL(user->getNickname(), channel)));//verifier si c'est le bon message
+			return (user->sendReply(ERR_NOSUCHCHANNEL(user->getNickname(), channel)));
 	if (this->_channels[channel]->foundUser(user->getNickname()) == false && this->_channels[channel]->foundOperator(user->getNickname()) == false)
-		return (user->sendReply(ERR_NOTONCHANNEL(user->getNickname(), channel)));//ERR_NOTONCHANNEL
+		return (user->sendReply(ERR_NOTONCHANNEL(user->getNickname(), channel)));
 	if (topic.empty())
 	{
 		topic = this->_channels[channel]->getTopic();
 		if (topic.empty())
-			return (user->sendReply(RPL_NOTOPIC(user->getNickname(), user->getServer(), channel)));	//=> RPL_NOTOPIC
+			return (user->sendReply(RPL_NOTOPIC(user->getNickname(), user->getServer(), channel)));
 		else
 		{
-			//il y a un topic dans le channel le return le nom du topic => RPL_TOPIC 
 			user->sendReply(RPL_TOPIC(user->getNickname(), user->getServer(), channel, this->_channels[channel]->getTopic()));
 			return (user->sendReply(RPL_TOPICWHOTIME(user->getNickname(), user->getServer(), channel, this->_channels[channel]->getTopicUser(), this->_channels[channel]->getTopicDate())));
 		}
 	}
-	if(this->_channels[channel]->getModeTopic())//vrai -> il faut etre operator
+	if(this->_channels[channel]->getModeTopic())
 	{
 		if (!this->_channels[channel]->foundOperator(user->getNickname()) == true)
 			return (user->sendReply(ERR_CHANOPRIVSNEEDED(user->getNickname(),channel)));
@@ -456,11 +440,51 @@ void	Server::_topicCmd(User *user, std::string param)
 void	Server::_whoCmd(User *user, std::string param)
 {
 	if (param[0] != '#')
-		return ; // ON GERE PAS, ON FAIT QUE LES CHANNELS
+		return ;
 	std::map<std::string, Channel*>::iterator it;
 	it = this->_channels.find(param);
 	if (it == this->_channels.end())
 		return (user->sendReply(ERR_NOSUCHCHANNEL(user->getNickname(), param)));
 	it->second->whoList(user);
 	return (user->sendReply(":" + user->getServer() + " 315 "+ user->getNickname() + ' ' + param + " :End of WHO list"));
+}
+
+void	Server::_noticeCmd(User *user, std::string param)
+{
+	std::map<std::string, std::string>	channel;
+	std::string target;
+	std::string text;
+	if (param.empty())
+		return (user->sendReply(ERR_NEEDMOREPARAMS(user->getNickname(), param)));
+	target = param.substr(0, param.find(' '));
+	text = param.substr(param.find(' ') + 1);
+	if (target[0] != '#')
+	{
+		std::map<int, User *>::iterator it;
+		for(it = this->_user.begin(); it != this->_user.end(); it++)
+		{
+			if(it->second->getNickname() == target)
+				break;
+		}
+		if (it == this->_user.end())
+		{
+			return(user->sendReply(ERR_NOSUCHNICK(user->getNickname(), target)));
+		}
+		return (it->second->sendReply(':' + user->getNickname() + "!" + user->getNickname() + "@" + user->getHostname() + " NOTICE " + target + " " + text));
+	}
+	else
+	{
+		std::map<std::string, Channel*>::iterator it;
+		for(it = this->_channels.begin(); it != this->_channels.end(); it++)
+		{
+			if(it->second->getName() == target)
+				break;
+		}
+		if (it == this->_channels.end())
+			return(user->sendReply(ERR_NOSUCHCHANNEL(user->getNickname(), target)));
+		if (it->second->foundUser(user->getNickname()) == true || it->second->foundOperator(user->getNickname()) == true)
+			return (it->second->sendMessage(user, (':' + user->getNickname() + "!" + user->getNickname() + "@" + user->getHostname() + " NOTICE " + target + " " + text)));
+		else
+			return (user->sendReply(ERR_CANNOTSENDTOCHAN(user->getNickname(), it->first)));
+	}
 }

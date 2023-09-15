@@ -6,7 +6,7 @@
 /*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/03 14:10:46 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/14 20:21:51 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/15 13:30:22 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,6 @@ bool loop;
 
 Server::Server()
 {
-
-	// std::cout << GREEN("Default Constructor") << std::endl;
 }
 
 Server::Server(std::string port, std::string password)
@@ -44,13 +42,10 @@ Server::Server(std::string port, std::string password)
 			  << std::endl;
 	_indexingCmd();
 	_runServer();
-	// std::cout << YELLOW("Server Constructor") << std::endl;
 }
 
 Server::~Server()
 {
-	
-	// std::cout << RED("Default Destructor") << std::endl;
 }
 
 void Server::_createServer(void)
@@ -137,7 +132,6 @@ void Server::_runServer()
 	*/
 	while (loop)
 	{
-		// std::cout << GREEN("DEBUG:") << "[INSIDE]" << std::endl;
 		pollRes = poll(this->_pollFd.data(), this->_pollFd.size(), -1); /* -1 to wait indefinitely */
 
 		if (pollRes != -1)
@@ -153,7 +147,7 @@ void Server::_runServer()
 						break;
 					}
 					this->_receiveData(it);
-					break ; // added this
+					break ;
 				}
 				else if (it->revents & POLLHUP)
 				{
@@ -226,7 +220,7 @@ void Server::_receiveData(pollfd_it &it)
 			this->_deleteUser(it);
 		}
 		else
-			_parseCmd(user); // essentiel pour connectio du cliet
+			_parseCmd(user);
 	}
 	catch (const std::out_of_range &e)
 	{

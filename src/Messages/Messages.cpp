@@ -6,7 +6,7 @@
 /*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 10:57:59 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/14 20:43:54 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/15 13:31:04 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ std::string RPL_MYINFO(std::string nick, std::string server){
 	return ":" + server + " 004 " + nick + " " + server + " irssi 1.2.3 (20210409 0011)" ;
 }
 
-// ??
+//Ping response
 std::string RPL_PONG(std::string source, std::string message) {
 	return ":" + source + " PONG :" + message;
 }
