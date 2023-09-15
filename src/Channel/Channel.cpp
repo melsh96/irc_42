@@ -6,7 +6,7 @@
 /*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 17:28:51 by fbily             #+#    #+#             */
-/*   Updated: 2023/09/15 14:45:29 by zhamdouc         ###   ########.fr       */
+/*   Updated: 2023/09/15 15:24:40 by zhamdouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,9 +51,8 @@ std::string	Channel::joinChannel(std::string key, User *user)
 		if (foundInvited(user->getNickname()) == false)
 			return (ERR_INVITEONLYCHAN(user->getNickname(), this->getName()));  
 	}
-	if (this->_maxUsers != 0 && this->_nbUser >= this->_maxUsers)
+	if ((this->_maxUsers != 0 && this->_nbUser >= this->_maxUsers) || this->_nbUser >= 1000)
 		return (ERR_CHANNELISFULL(user->getNickname(), this->getName()));
-	
 	if (this->_isKey == false || (this->_isKey == true && key == this->_key))
 	{
 		this->_Users.push_back(user);
@@ -223,28 +222,6 @@ void	Channel::kickModeInvited(std::string target)
 	}
 }
 
-// bool safeStringToInt(const std::string& str, int& result)
-// {
-//     std::stringstream ss(str);
-//     long temp; // Utiliser un type plus grand pour capturer les valeurs en dehors des limites de int
-
-//     ss >> temp; // Effectuer la conversion
-
-//     // Vérifier l'état du stringstream
-//     if (ss.fail() || !ss.eof()) {
-//         return false;
-//     }
-
-//     // Vérifier les limites pour le type int
-//     if (temp > INT_MAX || temp < INT_MIN) {
-//         return false;
-//     }
-
-//     // Tout est ok, affecter la valeur à result
-//     result = static_cast<unsigned int>(temp);
-//     return true;
-// }
-
 void	Channel::modeChannel(User *user, std::string modestring, std::string argument)
 {
 	int pos_argument = 0;
@@ -284,5 +261,5 @@ void	Channel::modeChannel(User *user, std::string modestring, std::string argume
 		}		
 	}
 	else
-		return ; //erreur car il ne commence pas par + ou -
+		return ;
 }
