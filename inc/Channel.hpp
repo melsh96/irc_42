@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 17:16:21 by fbily             #+#    #+#             */
-/*   Updated: 2023/09/15 14:38:05 by zhamdouc         ###   ########.fr       */
+/*   Updated: 2023/09/15 16:54:48 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,7 @@ class Channel
 		void			kickModeUser(std::string target);
 		void			kickModeOperator(std::string target);
 		void			kickModeInvited(std::string target);
+		bool			checkArgument(std::string modestring, std::string argument);
 };
 
 #endif

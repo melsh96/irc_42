@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 17:28:51 by fbily             #+#    #+#             */
-/*   Updated: 2023/09/15 15:58:39 by zhamdouc         ###   ########.fr       */
+/*   Updated: 2023/09/15 17:14:02 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -230,6 +230,8 @@ void	Channel::modeChannel(User *user, std::string modestring, std::string argume
 	int pos_argument = 0;
 	int sign = 0;
 
+	if (checkArgument(modestring, argument) == false)
+		return (user->sendReply(ERR_UNKNOWNERROR(user->getNickname(), user->getServer(), user->getHostname(), "MODE", "Bad format.")));
 	if(modestring[0] == '+' || modestring[0] == '-')
 	{
 		if(modestring[0] == '+')
@@ -240,29 +242,76 @@ void	Channel::modeChannel(User *user, std::string modestring, std::string argume
 		{
 			if (modestring[i] == '+')
 				sign = 1;
-			if (modestring[i] == '-')
+			else if (modestring[i] == '-')
 				sign = -1;
-			if (modestring[i] == 'i')
+			else if (modestring[i] == 'i')
 				set_inviteMode(user, sign);
-			if (modestring[i] == 't')
+			else if (modestring[i] == 't')
 				set_topicMode(user, sign);
-			if (modestring[i] == 'k')
+			else if (modestring[i] == 'k')
 			{
 				set_key(user, argument, pos_argument, sign);
 				pos_argument++;
 			}
-			if (modestring[i] == 'o')
+			else if (modestring[i] == 'o')
 			{
 				set_op(user, argument, pos_argument, sign);
 				pos_argument++;
 			}
-			if (modestring[i] == 'l')
+			else if (modestring[i] == 'l')
 			{
 				set_maxUsers(user, argument, pos_argument, sign);
 				pos_argument++;
 			}
+			else
+				user->sendReply(ERR_UNKNOWNMODE(user->getNickname(), modestring.substr(i, 1)));
 		}		
 	}
 	else
 		return ;
+}
+
+bool	Channel::checkArgument(std::string modestring, std::string argument)
+{
+	int	pos_argument = 0;
+	int sign = 0;
+	int	arg_count = 0;
+	size_t pos;
+	std::string arg_1;
+
+	while (!argument.empty())
+	{
+		pos = argument.find(' ');
+		arg_1 = argument.substr(0, argument.find(' '));
+		if (pos == std::string::npos)
+		{
+			argument.erase(0, arg_1.length());  
+			pos_argument++;
+			break;
+		}
+		else
+			argument.erase(0, arg_1.length() + 1);
+		pos_argument++;
+	}
+	if(modestring[0] == '+' || modestring[0] == '-')
+	{
+		if(modestring[0] == '+')
+			sign = 1;
+		if(modestring[0] == '-')
+			sign = -1;
+		for (size_t i = 1; i < modestring.size(); i++) 
+		{
+			if (modestring[i] == '+')
+				sign = 1;
+			else if (modestring[i] == '-')
+				sign = -1;
+			else if (sign == -1 && modestring[i] == 'k' && this->_isKey == true)
+				arg_count++;
+			else if (sign == 1 && (modestring[i] == 'k' || modestring[i] == 'o' || modestring[i] == 'l'))
+				arg_count++;
+		}
+	}
+	if (arg_count != pos_argument)
+		return false;
+	return (true);
 }

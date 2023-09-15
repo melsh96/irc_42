@@ -6,7 +6,7 @@
 /*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 16:23:13 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/15 13:29:27 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/15 16:29:14 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -381,9 +381,6 @@ void	Server::_modeCmd(User *user, std::string param)
 		}
 		if (modestring == "b")
 			return (user->sendReply(":" + user->getServer() + " 368 " + user->getNickname() + ' ' + channel + " :End of channel ban list"));
-		size_t pos = modestring.find_first_not_of("+-itkol");
-		if (pos != std::string::npos)
-			return (user->sendReply(ERR_UNKNOWNMODE(user->getNickname(), modestring.substr(pos, 1))));
 		if (this->_channels[channel]->foundOperator(user->getNickname()) == false)
 			return (user->sendReply(ERR_CHANOPRIVSNEEDED(user->getNickname(), channel)));
 		this->_channels[channel]->modeChannel(user, modestring, argument);

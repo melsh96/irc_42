@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ChannelSet.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
+/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/15 14:30:40 by zhamdouc          #+#    #+#             */
-/*   Updated: 2023/09/15 15:39:49 by zhamdouc         ###   ########.fr       */
+/*   Updated: 2023/09/15 16:49:17 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,6 +110,8 @@ void	Channel::set_op(User *user, std::string argument, int pos_argument, int sig
 	int pos_bis = 0;
 	size_t pos = 0;
 
+	if (argument.empty())
+		return ;
 	while (!argument.empty() && pos_bis <= pos_argument)
 	{
 		pos = argument.find(' ');
@@ -136,6 +138,8 @@ void	Channel::set_op(User *user, std::string argument, int pos_argument, int sig
 		}
 		if (sign == 1 && foundOperator(arg_1) == false)
 		{
+			if (foundUser(arg_1) == false)
+				return (user->sendReply(ERR_USERNOTINCHANNEL(user->getNickname(), this->_name, arg_1)));
 			this->_Operators.push_back(returnUser(arg_1));
 			kickModeUser(arg_1);
 			user->sendReply(":" + user->getNickname() + " MODE " + this->_name + " +o " + arg_1);
