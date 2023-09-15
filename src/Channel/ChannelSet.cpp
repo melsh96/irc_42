@@ -6,7 +6,7 @@
 /*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/15 14:30:40 by zhamdouc          #+#    #+#             */
-/*   Updated: 2023/09/15 15:13:51 by zhamdouc         ###   ########.fr       */
+/*   Updated: 2023/09/15 15:39:49 by zhamdouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,7 @@ void	Channel::set_key(User *user, std::string argument, int pos_argument, int si
 	{
 		if (arg_1 == "x")
 			return (user->sendReply(":" + user->getServer() + " 525 " + user->getNickname() + ' ' + this->_name + " :Key is not well-formed (x is not a valid key)"));
-		this->_key = true;
+		this->_isKey = true;
 		this->_key = arg_1;
 		user->sendReply(":" + user->getNickname() + " MODE " + this->_name + " +k");
 		sendMessage(user, ":" + user->getNickname() + " MODE " + this->_name + " +k");

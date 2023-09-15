@@ -6,7 +6,7 @@
 /*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 17:28:51 by fbily             #+#    #+#             */
-/*   Updated: 2023/09/15 15:24:40 by zhamdouc         ###   ########.fr       */
+/*   Updated: 2023/09/15 15:58:39 by zhamdouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ std::string	Channel::joinChannel(std::string key, User *user)
 	if (_inviteMode ==  true)
 	{
 		if (foundInvited(user->getNickname()) == false)
-			return (ERR_INVITEONLYCHAN(user->getNickname(), this->getName()));  
+			return (ERR_INVITEONLYCHAN(user->getNickname(), this->getName()));
 	}
 	if ((this->_maxUsers != 0 && this->_nbUser >= this->_maxUsers) || this->_nbUser >= 1000)
 		return (ERR_CHANNELISFULL(user->getNickname(), this->getName()));
@@ -57,6 +57,8 @@ std::string	Channel::joinChannel(std::string key, User *user)
 	{
 		this->_Users.push_back(user);
 		this->_nbUser++;
+		if(foundInvited(user->getNickname()) == true)
+			kickModeInvited(user->getNickname());
 		return (':' + user->getNickname() + "!" + user->getNickname() + "@" + user->getHostname() + " JOIN " + this->getName());
 	}
 	else
@@ -136,6 +138,7 @@ void	Channel::kickUser(User *user, std::string target, std::string comment)
 			this->sendMessage(user, ":" + user->getNickname() + " KICK " + this->_name + ' ' + target + ' ' + comment);
 			user->sendReply(":" + user->getNickname() + " KICK " + this->_name + ' ' + target + ' ' + comment);
 			this->_Users.erase(it);
+			this->_nbUser--;
 			break ;
 		}
 		it++;
