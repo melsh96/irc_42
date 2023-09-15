@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
+/*   By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/06 17:16:21 by fbily             #+#    #+#             */
-/*   Updated: 2023/09/14 18:29:18 by fbily            ###   ########.fr       */
+/*   Updated: 2023/09/15 14:38:05 by zhamdouc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,6 @@ class Channel
 		bool 			foundOperator(std::string nickname);
 		void			listUsersOnChannel(User *user);
 		void			addGuest(User *user);
-		bool			hasDuplicates(const std::string& str);
 		void			kickModeUser(std::string target);
 		void			kickModeOperator(std::string target);
 		void			kickModeInvited(std::string target);

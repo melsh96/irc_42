@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: fbily <fbily@student.42.fr>                +#+  +:+       +#+         #
+#    By: zhamdouc <zhamdouc@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/07/03 13:32:10 by meshahrv          #+#    #+#              #
-#    Updated: 2023/09/15 12:20:46 by fbily            ###   ########.fr        #
+#    Updated: 2023/09/15 14:35:58 by zhamdouc         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -31,7 +31,7 @@ INC_DIR = inc/
 SRC_SERVER = Server/Server.cpp Server/ServerCmds.cpp Server/ServerClean.cpp
 SRC_USER = User/User.cpp
 SRC_MSGS = Messages/Messages.cpp
-SRC_CHAN = Channel/Channel.cpp
+SRC_CHAN = Channel/Channel.cpp Channel/ChannelSet.cpp Channel/ChannelGet.cpp
 
 SRC = main.cpp \
 		$(addprefix $(SRC_DIR), $(SRC_SERVER)) \
