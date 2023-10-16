@@ -1,7 +1,7 @@
 
 # ft_irc
 
-Server IRC done with [Melodie Shahrvari](https://github.com/melsh96) & [Zakariya Hamdouchi](https://github.com/Zheylkoss) (see subject.pdf)
+Server IRC done with [Florian Bily](https://github.com/fbily42) & [Zakariya Hamdouchi](https://github.com/Zheylkoss) (see subject.pdf)
 
 
 ![irc](./image/irc.png)
