@@ -6,7 +6,7 @@
 /*   By: meshahrv <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 16:23:13 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/09/04 17:28:31 by meshahrv         ###   ########.fr       */
+/*   Updated: 2023/07/04 16:33:49 by meshahrv         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,10 +115,7 @@ void    Server::_nickCmd(User *user, std::string param)
 		if (it->second->getNickname() == param)
 			return (user->sendReply(ERR_NICKCOLLISION()));
 	}
-	std::string oldname =user->getNickname();
 	user->setNickname(param);
-	//return (user->sendReply(":" + oldname + "!" + user->getUsername() + "@localhost" + " NICK " + param));
-	return (user->sendReply(":" + oldname + " NICK " + param));
 }
 
 void    Server::_userCmd(User *user, std::string param)
