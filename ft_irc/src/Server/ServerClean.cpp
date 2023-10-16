@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerClean.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: meshahrv <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/04 17:40:05 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/07/04 17:40:30 by meshahrv         ###   ########.fr       */
+/*   Updated: 2023/09/13 15:45:59 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,5 +68,9 @@ void	Server::_clean()
 	for (pollfd_it it = _pollFd.begin(); it != _pollFd.end(); ++it)
 	{
 		close(it->fd);
+	}
+	for (std::map<std::string, Channel *>::iterator it = _channels.begin(); it != _channels.end(); it++)
+	{
+		delete it->second;
 	}
 }

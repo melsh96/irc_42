@@ -3,37 +3,44 @@
 /*                                                        :::      ::::::::   */
 /*   User.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: meshahrv <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/03 18:45:15 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/07/04 16:32:38 by meshahrv         ###   ########.fr       */
+/*   Updated: 2023/09/15 13:31:32 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/User.hpp"
 
 User::User() {
-
-	// std::cout << GREEN("Default Constructor") << std::endl;
-
 }
 
-// une des erreurs etait lié aux variables non initialisées et essentiel pour la suite.
-User::User(int fd, struct sockaddr_storage *userAddr) : _password(false), _welcomed(false), _hostname("localhost"), _server("IRC") {
+User::User(int fd, struct sockaddr_storage *userAddr) : _password(false), _welcomed(false), _server("IRC") {
 
+	char hostname[NI_MAXHOST];
+	struct sockaddr_in * sa = reinterpret_cast<struct sockaddr_in *>(userAddr);
+
+	int result = getnameinfo(reinterpret_cast<sockaddr *>(sa), sizeof(sockaddr_in), hostname, NI_MAXHOST, NULL, 0, 0);
+	if (result != 0)
+	{
+		std::cerr << rouge << "Error hostname" << fin << std::endl;
+		this->_hostname = "unknow";
+	}
+	this->_hostname = hostname;
     this->_fd = fd;
     this->_userAddr = userAddr;
-    
 }
 
 User::~User() {
-	
-	// std::cout << RED("Default Destructor") << std::endl;
 }
 
 int User::getUserFd() {
     
     return this->_fd;
+}
+
+std::string	User::getServer(){
+	return(_server);
 }
 
 std::string	User::getUsername(){
@@ -84,29 +91,17 @@ void    User::setPassword(bool password) {
 	_password = password;
 }
 
-void	User::welcome(void)
+void	User::welcome(std::string date)
 {
 	sendReply(RPL_WELCOME(_nickname, _server, _username, _hostname));
 	sendReply(RPL_YOURHOST(_nickname, _server));
-	sendReply(RPL_CREATED(_nickname, _server, timestamp()));
+	sendReply(RPL_CREATED(_nickname, _server, date));
 	sendReply(RPL_MYINFO(_nickname, _server));
 	_welcomed = true;
 }
 
 bool	User::hasBeenWelcomed() const{
 	return (_welcomed);
-}
-
-std::string User::timestamp()
-{
-	time_t now = time(0);
-	struct tm tstruct;
-	char buf[80];
-
-	tstruct = *localtime(&now);
-	strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
-	
-	return (buf);
 }
 
 void	User::clearMessage(){
@@ -120,13 +115,13 @@ void	User::sendReply(std::string reply)
 	size_t	nbytes = reply.length();
 	int		n;
 
+	std::cout << lila << (getNickname() + " SEND =>" + reply) << fin << std::endl;
 	while (total < nbytes)
 	{
 		n = send(_fd, &(reply[total]), nbytes - total, 0);
 		if (n == -1) break;
 		total += n;
 	}
-
 	if (n == -1)
 	{
 		std::cerr << "Error User::sendReply" << std::endl;

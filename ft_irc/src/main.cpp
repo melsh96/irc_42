@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: meshahrv <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/03 14:10:55 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/07/04 17:36:59 by meshahrv         ###   ########.fr       */
+/*   Updated: 2023/09/14 21:02:20 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,3 +40,5 @@ int main(int ac, char **av)
 
     return (0);
 }
+
+//rawlog OPEN ~/Desktop/GitHub/ft_irc/log_flo.txt

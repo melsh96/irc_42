@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: meshahrv <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: fbily <fbily@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/03 14:10:46 by meshahrv          #+#    #+#             */
-/*   Updated: 2023/07/04 17:43:48 by meshahrv         ###   ########.fr       */
+/*   Updated: 2023/09/15 13:30:22 by fbily            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,6 @@ bool loop;
 
 Server::Server()
 {
-
-	// std::cout << GREEN("Default Constructor") << std::endl;
 }
 
 Server::Server(std::string port, std::string password)
@@ -39,17 +37,15 @@ Server::Server(std::string port, std::string password)
 	this->_password = password;
 
 	_createServer();
+	this->_creationDate = _timestamp();
 	std::cout << YELLOW("[ SERVER CREATED ]") << std::endl
 			  << std::endl;
 	_indexingCmd();
 	_runServer();
-	// std::cout << YELLOW("Server Constructor") << std::endl;
 }
 
 Server::~Server()
 {
-
-	// std::cout << RED("Default Destructor") << std::endl;
 }
 
 void Server::_createServer(void)
@@ -111,6 +107,7 @@ void Server::_createServer(void)
 	std::cout << GREEN("### Success ### ") << GREY("...listen()") << std::endl;
 
 	this->_listenSocket = socketFd;
+	freeaddrinfo(result);
 }
 
 void Server::_runServer()
@@ -135,7 +132,6 @@ void Server::_runServer()
 	*/
 	while (loop)
 	{
-		// std::cout << GREEN("DEBUG:") << "[INSIDE]" << std::endl;
 		pollRes = poll(this->_pollFd.data(), this->_pollFd.size(), -1); /* -1 to wait indefinitely */
 
 		if (pollRes != -1)
@@ -151,7 +147,7 @@ void Server::_runServer()
 						break;
 					}
 					this->_receiveData(it);
-					break ; // added this
+					break ;
 				}
 				else if (it->revents & POLLHUP)
 				{
@@ -220,10 +216,11 @@ void Server::_receiveData(pollfd_it &it)
 				std::cerr << RED("Error: ") << "socket hung up" << std::endl;
 			else
 				std::cerr << RED("Error: ") << "recv()" << std::endl;
+			_leaveChannels(user);
 			this->_deleteUser(it);
 		}
 		else
-			_parseCmd(user); // essentiel pour connectio du cliet
+			_parseCmd(user);
 	}
 	catch (const std::out_of_range &e)
 	{
@@ -233,7 +230,6 @@ void Server::_receiveData(pollfd_it &it)
 
 int Server::_getData(User *user)
 {
-
 	int nbyte = 0;
 	int fd = user->getUserFd();
 	char buffer[1024];
@@ -247,11 +243,64 @@ int Server::_getData(User *user)
 		if (nbyte <= 0)
 			break;
 		str.append(buffer);
-	}
-
+	} 
 	std::cout << GREEN("### Success ### ") << GREY("...recv()") << std::endl;
-	std::cout << YELLOW("[ MESSAGE RECEIVED : ") << str << YELLOW("]") << std::endl << std::endl;
-	user->setMessage(str); // did not set the message in the user
-
+	std::cout << YELLOW("[ MESSAGE RECEIVED : ") << bluberry + user->getNickname()+ " => " << str + fin << YELLOW("]") << std::endl << std::endl;
+	user->setMessage(str);
 	return (nbyte);
+}
+
+std::string Server::_timestamp()
+{
+	time_t now = time(0);
+	struct tm tstruct;
+	char buf[80];
+
+	tstruct = *localtime(&now);
+	strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
+	
+	return (buf);
+}
+
+User *	Server::_findUser(std::string nick)
+{
+	User *	tmp;
+	std::map<int, User *>::iterator	it = this->_user.begin();
+	tmp = it->second;
+	while (it != this->_user.end())
+	{
+		if (it->second->getNickname() == nick)
+			return (it->second);
+		it++;
+	}
+	return (tmp);
+}
+
+void	Server::_leaveChannels(User *user)
+{
+	std::map<std::string, Channel *>::iterator it = this->_channels.begin();
+	while (it != this->_channels.end())
+	{
+		if (it->second->foundOperator(user->getNickname()) == true)
+		{
+			it->second->kickModeOperator(user->getNickname());
+			it->second->setNbUser(-1);
+		}
+		if (it->second->foundUser(user->getNickname()) == true)
+		{
+			it->second->kickModeUser(user->getNickname());
+			it->second->setNbUser(-1);
+		}
+		if (it->second->foundInvited(user->getNickname()) == true)
+			it->second->kickModeInvited(user->getNickname());
+		if (it->second->getNbUser() <= 0)
+		{
+			std::map<std::string, Channel *>::iterator tmp = it;
+			it++;
+			delete this->_channels[tmp->first];
+			this->_channels.erase(tmp);
+		}
+		else
+			it++;
+	}
 }
